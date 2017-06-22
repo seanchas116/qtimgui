@@ -33,3 +33,5 @@ SOURCES += \
 HEADERS += \
         widget.h \
     imguiwidget.h
+
+INCLUDEPATH += imgui
