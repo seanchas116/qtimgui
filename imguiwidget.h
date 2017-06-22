@@ -37,6 +37,8 @@ private:
     bool createFontsTexture();
     bool createDeviceObjects();
     void newFrame();
+
+    void updateMousePressed(QMouseEvent *event);
 };
 
 #endif // IMGUIWIDGET_H

@@ -13,18 +13,7 @@ ImGuiWidget::ImGuiWidget(QWidget *parent) : QOpenGLWidget(parent)
 
 void ImGuiWidget::mousePressEvent(QMouseEvent *event)
 {
-    qDebug() << "mouse pressed" << event->button();
-    switch (event->button()) {
-    case Qt::LeftButton:
-        g_MousePressed[0] = true;
-        break;
-    case Qt::RightButton:
-        g_MousePressed[1] = true;
-        break;
-    case Qt::MiddleButton:
-        g_MousePressed[2] = true;
-        break;
-    }
+    updateMousePressed(event);
 }
 
 void ImGuiWidget::mouseMoveEvent(QMouseEvent *event)
@@ -33,7 +22,7 @@ void ImGuiWidget::mouseMoveEvent(QMouseEvent *event)
 
 void ImGuiWidget::mouseReleaseEvent(QMouseEvent *event)
 {
-
+    updateMousePressed(event);
 }
 
 void ImGuiWidget::wheelEvent(QWheelEvent *event)
@@ -305,9 +294,7 @@ void ImGuiWidget::newFrame()
 
     for (int i = 0; i < 3; i++)
     {
-        // io.MouseDown[i] = g_MousePressed[i] || glfwGetMouseButton(g_Window, i) != 0;    // If a mouse press event came, always pass it as "mouse held this frame", so we don't miss click-release events that are shorter than 1 frame.
         io.MouseDown[i] = g_MousePressed[i];
-        g_MousePressed[i] = false;
     }
 
     io.MouseWheel = g_MouseWheel;
@@ -318,6 +305,13 @@ void ImGuiWidget::newFrame()
 
     // Start the frame
     ImGui::NewFrame();
+}
+
+void ImGuiWidget::updateMousePressed(QMouseEvent *event)
+{
+    g_MousePressed[0] = event->buttons() & Qt::LeftButton;
+    g_MousePressed[1] = event->buttons() & Qt::RightButton;
+    g_MousePressed[2] = event->buttons() & Qt::MiddleButton;
 }
 
 ImGuiWidget *ImGuiWidget::m_instance = nullptr;
