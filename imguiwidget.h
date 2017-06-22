@@ -5,7 +5,8 @@
 #include <QOpenGLExtraFunctions>
 #include <imgui.h>
 
-class ImGuiWidget : public QOpenGLWidget, QOpenGLExtraFunctions
+// TODO: do not expose QOpenGLExtraFunctions
+class ImGuiWidget : public QOpenGLWidget, protected QOpenGLExtraFunctions
 {
 public:
     ImGuiWidget(QWidget *parent = nullptr);

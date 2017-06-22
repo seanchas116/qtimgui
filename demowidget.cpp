@@ -34,4 +34,9 @@ void DemoWidget::renderUI()
         ImGui::SetNextWindowPos(ImVec2(650, 20), ImGuiSetCond_FirstUseEver);
         ImGui::ShowTestWindow(&show_test_window);
     }
+
+    // Do render before ImGui UI is rendered
+    glViewport(0, 0, width(), height());
+    glClearColor(clear_color.x, clear_color.y, clear_color.z, clear_color.w);
+    glClear(GL_COLOR_BUFFER_BIT);
 }

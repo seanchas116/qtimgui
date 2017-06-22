@@ -2,6 +2,7 @@
 #define DEMOWIDGET_H
 
 #include "imguiwidget.h"
+#include <QOpenGLExtraFunctions>
 
 class DemoWidget : public ImGuiWidget
 {
