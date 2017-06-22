@@ -25,13 +25,14 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 SOURCES += \
         main.cpp \
-        widget.cpp \
     imguiwidget.cpp \
     imgui/imgui_draw.cpp \
-    imgui/imgui.cpp
+    imgui/imgui.cpp \
+    demowidget.cpp \
+    imgui/imgui_demo.cpp
 
 HEADERS += \
-        widget.h \
-    imguiwidget.h
+    imguiwidget.h \
+    demowidget.h
 
 INCLUDEPATH += imgui

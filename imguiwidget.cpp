@@ -1,10 +1,14 @@
 #include "imguiwidget.h"
 #include <QDateTime>
 #include <QMouseEvent>
+#include <QDebug>
 
 ImGuiWidget::ImGuiWidget(QWidget *parent) : QOpenGLWidget(parent)
 {
-
+    if (m_instance) {
+        qFatal("Cannot create multiple ImGuiWidget instance");
+    }
+    m_instance = this;
 }
 
 void ImGuiWidget::mousePressEvent(QMouseEvent *event)
@@ -40,7 +44,13 @@ void ImGuiWidget::wheelEvent(QWheelEvent *event)
 
 void ImGuiWidget::initializeGL()
 {
+    initializeOpenGLFunctions();
 
+    ImGuiIO &io = ImGui::GetIO();
+
+    io.RenderDrawListsFn = [](ImDrawData *drawData) {
+        m_instance->renderDrawList(drawData);
+    };
 }
 
 void ImGuiWidget::resizeGL(int w, int h)
@@ -50,8 +60,13 @@ void ImGuiWidget::resizeGL(int w, int h)
 
 void ImGuiWidget::paintGL()
 {
+    newFrame();
+    renderUI();
 
-
+    glViewport(0, 0, width(), height());
+    glClearColor(0, 0, 0, 1);
+    glClear(GL_COLOR_BUFFER_BIT);
+    ImGui::Render();
 }
 
 void ImGuiWidget::renderDrawList(ImDrawData *draw_data)
@@ -268,7 +283,7 @@ void ImGuiWidget::newFrame()
     // glfwGetWindowSize(g_Window, &w, &h);
     // glfwGetFramebufferSize(g_Window, &display_w, &display_h);
     w = display_w = width();
-    w = display_h = height();
+    h = display_h = height();
     io.DisplaySize = ImVec2((float)w, (float)h);
     io.DisplayFramebufferScale = ImVec2(w > 0 ? ((float)display_w / w) : 0, h > 0 ? ((float)display_h / h) : 0);
 
@@ -304,3 +319,5 @@ void ImGuiWidget::newFrame()
     // Start the frame
     ImGui::NewFrame();
 }
+
+ImGuiWidget *ImGuiWidget::m_instance = nullptr;
