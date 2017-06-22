@@ -23,7 +23,6 @@ protected:
 
 private:
     double       g_Time = 0.0f;
-    float        g_MousePosition[2] = { 0.0, 0.0 };
     bool         g_MousePressed[3] = { false, false, false };
     float        g_MouseWheel = 0.0f;
     GLuint       g_FontTexture = 0;

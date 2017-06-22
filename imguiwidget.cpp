@@ -13,6 +13,7 @@ ImGuiWidget::ImGuiWidget(QWidget *parent) : QOpenGLWidget(parent)
 
 void ImGuiWidget::mousePressEvent(QMouseEvent *event)
 {
+    qDebug() << "mouse pressed" << event->button();
     switch (event->button()) {
     case Qt::LeftButton:
         g_MousePressed[0] = true;
@@ -28,8 +29,6 @@ void ImGuiWidget::mousePressEvent(QMouseEvent *event)
 
 void ImGuiWidget::mouseMoveEvent(QMouseEvent *event)
 {
-    g_MousePosition[0] = event->x();
-    g_MousePosition[1] = event->y();
 }
 
 void ImGuiWidget::mouseReleaseEvent(QMouseEvent *event)
@@ -294,9 +293,10 @@ void ImGuiWidget::newFrame()
 
     // Setup inputs
     // (we already got mouse wheel, keyboard keys & characters from glfw callbacks polled in glfwPollEvents())
-    if (hasFocus())
+    if (isActiveWindow())
     {
-        io.MousePos = ImVec2(g_MousePosition[0], g_MousePosition[1]);   // Mouse position in screen coordinates (set to -1,-1 if no mouse / on another screen, etc.)
+        auto pos = mapFromGlobal(QCursor::pos());
+        io.MousePos = ImVec2(pos.x(), pos.y());   // Mouse position in screen coordinates (set to -1,-1 if no mouse / on another screen, etc.)
     }
     else
     {
