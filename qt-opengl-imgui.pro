@@ -25,7 +25,9 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 SOURCES += \
         main.cpp \
-        widget.cpp
+        widget.cpp \
+    imguiwidget.cpp
 
 HEADERS += \
-        widget.h
+        widget.h \
+    imguiwidget.h
