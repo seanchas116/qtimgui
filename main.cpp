@@ -1,9 +1,15 @@
 #include "demowidget.h"
 #include <QApplication>
 #include <QTimer>
+#include <QSurfaceFormat>
 
 int main(int argc, char *argv[])
 {
+    QSurfaceFormat glFormat;
+    glFormat.setVersion(4, 1);
+    glFormat.setProfile(QSurfaceFormat::CoreProfile);
+    QSurfaceFormat::setDefaultFormat(glFormat);
+
     QApplication a(argc, argv);
     DemoWidget w;
     w.show();
