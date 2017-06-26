@@ -5,8 +5,39 @@
 
 namespace QtImGui {
 
+namespace {
+
+QHash<int, ImGuiKey> keyMap = {
+    { Qt::Key_Tab, ImGuiKey_Tab },
+    { Qt::Key_Left, ImGuiKey_LeftArrow },
+    { Qt::Key_Right, ImGuiKey_RightArrow },
+    { Qt::Key_Up, ImGuiKey_UpArrow },
+    { Qt::Key_Down, ImGuiKey_DownArrow },
+    { Qt::Key_PageUp, ImGuiKey_PageUp },
+    { Qt::Key_PageDown, ImGuiKey_PageDown },
+    { Qt::Key_Home, ImGuiKey_Home },
+    { Qt::Key_End, ImGuiKey_End },
+    { Qt::Key_Delete, ImGuiKey_Delete },
+    { Qt::Key_Backspace, ImGuiKey_Backspace },
+    { Qt::Key_Enter, ImGuiKey_Enter },
+    { Qt::Key_Escape, ImGuiKey_Escape },
+    { Qt::Key_A, ImGuiKey_A },
+    { Qt::Key_C, ImGuiKey_C },
+    { Qt::Key_V, ImGuiKey_V },
+    { Qt::Key_X, ImGuiKey_X },
+    { Qt::Key_Y, ImGuiKey_Y },
+    { Qt::Key_Z, ImGuiKey_Z },
+};
+
+}
+
 void ImGuiRenderer::initialize() {
     initializeOpenGLFunctions();
+
+    ImGuiIO &io = ImGui::GetIO();
+    for (ImGuiKey key : keyMap.values()) {
+        io.KeyMap[key] = key;
+    }
 }
 
 void ImGuiRenderer::renderDrawList(ImDrawData *draw_data)
@@ -275,6 +306,10 @@ void ImGuiRenderer::onWheel(QWheelEvent *event)
 void ImGuiRenderer::onKeyPressRelease(QKeyEvent *event)
 {
     ImGuiIO& io = ImGui::GetIO();
+    if (keyMap.contains(event->key())) {
+        io.KeysDown[keyMap[event->key()]] = event->type() == QEvent::KeyPress;
+    }
+
     if (event->type() == QEvent::KeyPress) {
         QString text = event->text();
         if (text.size() == 1) {
