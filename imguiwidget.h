@@ -2,11 +2,10 @@
 #define IMGUIWIDGET_H
 
 #include <QOpenGLWidget>
-#include <QOpenGLExtraFunctions>
-#include <imgui.h>
 
-// TODO: do not expose QOpenGLExtraFunctions
-class ImGuiWidget : public QOpenGLWidget, protected QOpenGLExtraFunctions
+class ImGuiRenderer;
+
+class ImGuiWidget : public QOpenGLWidget
 {
 public:
     ImGuiWidget(QWidget *parent = nullptr);
@@ -14,7 +13,6 @@ public:
 
 protected:
     void mousePressEvent(QMouseEvent *event) override;
-    void mouseMoveEvent(QMouseEvent *event) override;
     void mouseReleaseEvent(QMouseEvent *event) override;
     void wheelEvent(QWheelEvent *event) override;
     void initializeGL() override;
@@ -23,23 +21,9 @@ protected:
     virtual void renderUI() = 0;
 
 private:
-    double       g_Time = 0.0f;
-    bool         g_MousePressed[3] = { false, false, false };
-    float        g_MouseWheel = 0.0f;
-    GLuint       g_FontTexture = 0;
-    int          g_ShaderHandle = 0, g_VertHandle = 0, g_FragHandle = 0;
-    int          g_AttribLocationTex = 0, g_AttribLocationProjMtx = 0;
-    int          g_AttribLocationPosition = 0, g_AttribLocationUV = 0, g_AttribLocationColor = 0;
-    unsigned int g_VboHandle = 0, g_VaoHandle = 0, g_ElementsHandle = 0;
-
     static ImGuiWidget *m_instance;
+    ImGuiRenderer *m_renderer;
 
-    void renderDrawList(ImDrawData *draw_data);
-    bool createFontsTexture();
-    bool createDeviceObjects();
-    void newFrame();
-
-    void updateMousePressed(QMouseEvent *event);
 };
 
 #endif // IMGUIWIDGET_H

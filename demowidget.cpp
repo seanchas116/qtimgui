@@ -5,6 +5,12 @@ DemoWidget::DemoWidget(QWidget *parent) : ImGuiWidget(parent)
 
 }
 
+void DemoWidget::initializeGL()
+{
+    ImGuiWidget::initializeGL();
+    initializeOpenGLFunctions();
+}
+
 void DemoWidget::renderUI()
 {
     // 1. Show a simple window

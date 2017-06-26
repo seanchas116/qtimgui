@@ -3,8 +3,9 @@
 
 #include "imguiwidget.h"
 #include <QOpenGLExtraFunctions>
+#include <imgui.h>
 
-class DemoWidget : public ImGuiWidget
+class DemoWidget : public ImGuiWidget, private QOpenGLExtraFunctions
 {
     Q_OBJECT
 public:
@@ -15,6 +16,7 @@ signals:
 public slots:
 
 protected:
+    void initializeGL() override;
     void renderUI() override;
 
 private:
