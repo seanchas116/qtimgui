@@ -15,7 +15,7 @@ int main(int argc, char *argv[])
     w.show();
     QTimer timer;
     QObject::connect(&timer, SIGNAL(timeout()), &w, SLOT(update()));
-    timer.start();
+    timer.start(16);
 
     return a.exec();
 }

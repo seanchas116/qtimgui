@@ -23,7 +23,6 @@ protected:
 private:
     static ImGuiWidget *m_instance;
     ImGuiRenderer *m_renderer;
-
 };
 
 #endif // IMGUIWIDGET_H
