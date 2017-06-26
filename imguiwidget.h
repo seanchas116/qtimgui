@@ -16,8 +16,10 @@ protected:
     void mousePressEvent(QMouseEvent *event) override;
     void mouseReleaseEvent(QMouseEvent *event) override;
     void wheelEvent(QWheelEvent *event) override;
-    void initializeImGui();
-    void newFrameImGui();
+    void initializeGL() override;
+    void resizeGL(int w, int h) override;
+    void paintGL() override;
+    virtual void renderUI() = 0;
 
 private:
     static ImGuiWidget *m_instance;

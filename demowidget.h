@@ -16,7 +16,7 @@ public slots:
 
 protected:
     void initializeGL() override;
-    void paintGL() override;
+    void renderUI() override;
 
 private:
     bool show_test_window = true;

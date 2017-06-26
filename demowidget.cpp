@@ -7,14 +7,12 @@ DemoWidget::DemoWidget(QWidget *parent) : ImGuiWidget(parent)
 
 void DemoWidget::initializeGL()
 {
-    initializeImGui();
+    ImGuiWidget::initializeGL();
     initializeOpenGLFunctions();
 }
 
-void DemoWidget::paintGL()
+void DemoWidget::renderUI()
 {
-    newFrameImGui();
-
     // 1. Show a simple window
     // Tip: if we don't call ImGui::Begin()/ImGui::End() the widgets appears in a window automatically called "Debug"
     {
@@ -47,6 +45,4 @@ void DemoWidget::paintGL()
     glViewport(0, 0, width(), height());
     glClearColor(clear_color.x, clear_color.y, clear_color.z, clear_color.w);
     glClear(GL_COLOR_BUFFER_BIT);
-
-    ImGui::Render();
 }
