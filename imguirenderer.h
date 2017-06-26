@@ -44,4 +44,7 @@ private:
     unsigned int g_VboHandle = 0, g_VaoHandle = 0, g_ElementsHandle = 0;
 };
 
+void initialize(QWidget *window);
+void newFrame();
+
 }

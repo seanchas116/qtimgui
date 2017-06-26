@@ -371,4 +371,12 @@ ImGuiRenderer* ImGuiRenderer::instance() {
     return instance;
 }
 
+void initialize(QWidget *window) {
+    ImGuiRenderer::instance()->initialize(window);
+}
+
+void newFrame() {
+    ImGuiRenderer::instance()->newFrame();
+}
+
 }

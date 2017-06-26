@@ -9,12 +9,12 @@ DemoWidget::DemoWidget(QWidget *parent) : QOpenGLWidget(parent)
 void DemoWidget::initializeGL()
 {
     initializeOpenGLFunctions();
-    QtImGui::ImGuiRenderer::instance()->initialize(this);
+    QtImGui::initialize(this);
 }
 
 void DemoWidget::paintGL()
 {
-    QtImGui::ImGuiRenderer::instance()->newFrame();
+    QtImGui::newFrame();
 
     // 1. Show a simple window
     // Tip: if we don't call ImGui::Begin()/ImGui::End() the widgets appears in a window automatically called "Debug"
