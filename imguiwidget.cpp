@@ -29,7 +29,7 @@ void ImGuiWidget::wheelEvent(QWheelEvent *event)
     m_renderer->onWheel(event);
 }
 
-void ImGuiWidget::initializeGL()
+void ImGuiWidget::initializeImGui()
 {
     m_renderer->initialize();
 
@@ -40,16 +40,9 @@ void ImGuiWidget::initializeGL()
     };
 }
 
-void ImGuiWidget::resizeGL(int w, int h)
-{
-
-}
-
-void ImGuiWidget::paintGL()
+void ImGuiWidget::newFrameImGui()
 {
     m_renderer->newFrame();
-    renderUI();
-    ImGui::Render();
 }
 
 ImGuiWidget *ImGuiWidget::m_instance = nullptr;
