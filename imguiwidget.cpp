@@ -43,7 +43,7 @@ void ImGuiWidget::initializeGL()
 void ImGuiWidget::paintGL()
 {
     m_renderer->newFrame();
-    renderUI();
+    renderImGui();
     ImGui::Render();
 }
 

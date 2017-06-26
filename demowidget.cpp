@@ -11,7 +11,7 @@ void DemoWidget::initializeGL()
     initializeOpenGLFunctions();
 }
 
-void DemoWidget::renderUI()
+void DemoWidget::renderImGui()
 {
     // 1. Show a simple window
     // Tip: if we don't call ImGui::Begin()/ImGui::End() the widgets appears in a window automatically called "Debug"

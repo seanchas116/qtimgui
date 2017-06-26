@@ -18,7 +18,7 @@ protected:
     void wheelEvent(QWheelEvent *event) override;
     void initializeGL() override;
     void paintGL() override;
-    virtual void renderUI() = 0;
+    virtual void renderImGui() = 0;
 
 private:
     static ImGuiWidget *m_instance;
