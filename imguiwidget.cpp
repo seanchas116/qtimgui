@@ -40,11 +40,6 @@ void ImGuiWidget::initializeGL()
     };
 }
 
-void ImGuiWidget::resizeGL(int w, int h)
-{
-
-}
-
 void ImGuiWidget::paintGL()
 {
     m_renderer->newFrame();
