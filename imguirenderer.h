@@ -26,7 +26,8 @@ public:
     bool createDeviceObjects();
     void newFrame();
 
-    void updateMousePressed(QMouseEvent *event);
+    void onMousePressedChange(QMouseEvent *event);
+    void onWheel(QWheelEvent *event);
 };
 
 

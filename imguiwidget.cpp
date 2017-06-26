@@ -14,16 +14,17 @@ ImGuiWidget::ImGuiWidget(QWidget *parent) : QOpenGLWidget(parent)
 
 void ImGuiWidget::mousePressEvent(QMouseEvent *event)
 {
-    m_renderer->updateMousePressed(event);
+    m_renderer->onMousePressedChange(event);
 }
 
 void ImGuiWidget::mouseReleaseEvent(QMouseEvent *event)
 {
-    m_renderer->updateMousePressed(event);
+    m_renderer->onMousePressedChange(event);
 }
 
 void ImGuiWidget::wheelEvent(QWheelEvent *event)
 {
+    m_renderer->onWheel(event);
 }
 
 void ImGuiWidget::initializeGL()

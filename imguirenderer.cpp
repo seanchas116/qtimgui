@@ -256,9 +256,14 @@ void ImGuiRenderer::newFrame()
     ImGui::NewFrame();
 }
 
-void ImGuiRenderer::updateMousePressed(QMouseEvent *event)
+void ImGuiRenderer::onMousePressedChange(QMouseEvent *event)
 {
     g_MousePressed[0] = event->buttons() & Qt::LeftButton;
     g_MousePressed[1] = event->buttons() & Qt::RightButton;
     g_MousePressed[2] = event->buttons() & Qt::MiddleButton;
+}
+
+void ImGuiRenderer::onWheel(QWheelEvent *event)
+{
+    g_MouseWheel += event->angleDelta().y() / 8.0;
 }
