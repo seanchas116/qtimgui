@@ -13,8 +13,10 @@ namespace QtImGui {
 class ImGuiRenderer : public QObject, QOpenGLExtraFunctions {
     Q_OBJECT
 public:
-    void initialize(QWidget *widget);
+    void initialize(QWidget *window);
     void newFrame();
+
+    QWidget *window() const { return m_window; }
 
     bool eventFilter(QObject *watched, QEvent *event);
 
@@ -31,7 +33,7 @@ private:
     bool createFontsTexture();
     bool createDeviceObjects();
 
-    QWidget *widget;
+    QWidget *m_window;
     double       g_Time = 0.0f;
     bool         g_MousePressed[3] = { false, false, false };
     float        g_MouseWheel = 0.0f;

@@ -35,8 +35,8 @@ QByteArray g_currentClipboardText;
 
 }
 
-void ImGuiRenderer::initialize(QWidget *widget) {
-    this->widget = widget;
+void ImGuiRenderer::initialize(QWidget *window) {
+    m_window = window;
     initializeOpenGLFunctions();
 
     ImGuiIO &io = ImGui::GetIO();
@@ -57,7 +57,7 @@ void ImGuiRenderer::initialize(QWidget *widget) {
         return (const char *)g_currentClipboardText.data();
     };
 
-    widget->installEventFilter(this);
+    window->installEventFilter(this);
 }
 
 void ImGuiRenderer::renderDrawList(ImDrawData *draw_data)
@@ -273,8 +273,8 @@ void ImGuiRenderer::newFrame()
     int display_w, display_h;
     // glfwGetWindowSize(g_Window, &w, &h);
     // glfwGetFramebufferSize(g_Window, &display_w, &display_h);
-    w = display_w = widget->width();
-    h = display_h = widget->height();
+    w = display_w = m_window->width();
+    h = display_h = m_window->height();
     io.DisplaySize = ImVec2((float)w, (float)h);
     io.DisplayFramebufferScale = ImVec2(w > 0 ? ((float)display_w / w) : 0, h > 0 ? ((float)display_h / h) : 0);
 
@@ -285,9 +285,9 @@ void ImGuiRenderer::newFrame()
 
     // Setup inputs
     // (we already got mouse wheel, keyboard keys & characters from glfw callbacks polled in glfwPollEvents())
-    if (widget->isActiveWindow())
+    if (m_window->isActiveWindow())
     {
-        auto pos = widget->mapFromGlobal(QCursor::pos());
+        auto pos = m_window->mapFromGlobal(QCursor::pos());
         io.MousePos = ImVec2(pos.x(), pos.y());   // Mouse position in screen coordinates (set to -1,-1 if no mouse / on another screen, etc.)
     }
     else
