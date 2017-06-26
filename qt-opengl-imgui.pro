@@ -29,10 +29,10 @@ SOURCES += \
     imgui/imgui.cpp \
     demowidget.cpp \
     imgui/imgui_demo.cpp \
-    imguirenderer.cpp
+    qtimgui.cpp
 
 HEADERS += \
     demowidget.h \
-    imguirenderer.h
+    qtimgui.h
 
 INCLUDEPATH += imgui

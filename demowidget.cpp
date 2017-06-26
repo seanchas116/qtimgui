@@ -1,5 +1,5 @@
 #include "demowidget.h"
-#include "imguirenderer.h"
+#include "qtimgui.h"
 
 DemoWidget::DemoWidget(QWidget *parent) : QOpenGLWidget(parent)
 {
