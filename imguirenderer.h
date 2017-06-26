@@ -1,9 +1,10 @@
-#ifndef IMGUIRENDERER_H
-#define IMGUIRENDERER_H
+#pragma once
 
 #include <QOpenGLExtraFunctions>
 #include <imgui.h>
 #include "imguiwidget.h"
+
+namespace QtImGui {
 
 class ImGuiRenderer : QOpenGLExtraFunctions {
 public:
@@ -30,5 +31,4 @@ public:
     void onWheel(QWheelEvent *event);
 };
 
-
-#endif // IMGUIRENDERER_H
+}

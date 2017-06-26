@@ -1,7 +1,8 @@
-#ifndef IMGUIWIDGET_H
-#define IMGUIWIDGET_H
+#pragma once
 
 #include <QOpenGLWidget>
+
+namespace QtImGui {
 
 class ImGuiRenderer;
 
@@ -25,4 +26,4 @@ private:
     ImGuiRenderer *m_renderer;
 };
 
-#endif // IMGUIWIDGET_H
+}

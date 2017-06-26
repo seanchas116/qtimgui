@@ -1,11 +1,10 @@
-#ifndef DEMOWIDGET_H
-#define DEMOWIDGET_H
+#pragma once
 
 #include "imguiwidget.h"
 #include <QOpenGLExtraFunctions>
 #include <imgui.h>
 
-class DemoWidget : public ImGuiWidget, private QOpenGLExtraFunctions
+class DemoWidget : public QtImGui::ImGuiWidget, private QOpenGLExtraFunctions
 {
     Q_OBJECT
 public:
@@ -24,5 +23,3 @@ private:
     bool show_another_window = false;
     ImVec4 clear_color = ImColor(114, 144, 154);
 };
-
-#endif // DEMOWIDGET_H

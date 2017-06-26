@@ -3,6 +3,8 @@
 #include <QMouseEvent>
 #include <QOpenGLExtraFunctions>
 
+namespace QtImGui {
+
 ImGuiWidget::ImGuiWidget(QWidget *parent) : QOpenGLWidget(parent)
 {
     m_renderer = new ImGuiRenderer(this);
@@ -51,3 +53,5 @@ void ImGuiWidget::paintGL()
 }
 
 ImGuiWidget *ImGuiWidget::m_instance = nullptr;
+
+}

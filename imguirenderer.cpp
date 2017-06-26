@@ -2,6 +2,8 @@
 #include <QDateTime>
 #include <QMouseEvent>
 
+namespace QtImGui {
+
 void ImGuiRenderer::initialize() {
     initializeOpenGLFunctions();
 }
@@ -266,4 +268,6 @@ void ImGuiRenderer::onMousePressedChange(QMouseEvent *event)
 void ImGuiRenderer::onWheel(QWheelEvent *event)
 {
     g_MouseWheel += event->angleDelta().y() / 8.0;
+}
+
 }
