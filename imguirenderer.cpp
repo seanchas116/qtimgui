@@ -1,6 +1,7 @@
 #include "imguirenderer.h"
 #include <QDateTime>
 #include <QMouseEvent>
+#include <QDebug>
 
 namespace QtImGui {
 
@@ -268,6 +269,17 @@ void ImGuiRenderer::onMousePressedChange(QMouseEvent *event)
 void ImGuiRenderer::onWheel(QWheelEvent *event)
 {
     g_MouseWheel += event->angleDelta().y() / 8.0;
+}
+
+void ImGuiRenderer::onKeyPressRelease(QKeyEvent *event)
+{
+    ImGuiIO& io = ImGui::GetIO();
+    if (event->type() == QEvent::KeyPress) {
+        QString text = event->text();
+        if (text.size() == 1) {
+            io.AddInputCharacter(text.at(0).unicode());
+        }
+    }
 }
 
 }

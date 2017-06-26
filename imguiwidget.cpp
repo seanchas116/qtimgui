@@ -29,6 +29,16 @@ void ImGuiWidget::wheelEvent(QWheelEvent *event)
     m_renderer->onWheel(event);
 }
 
+void ImGuiWidget::keyPressEvent(QKeyEvent *event)
+{
+    m_renderer->onKeyPressRelease(event);
+}
+
+void ImGuiWidget::keyReleaseEvent(QKeyEvent *event)
+{
+    m_renderer->onKeyPressRelease(event);
+}
+
 void ImGuiWidget::initializeGL()
 {
     m_renderer->initialize();

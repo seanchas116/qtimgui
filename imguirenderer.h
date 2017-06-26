@@ -19,6 +19,7 @@ public:
 
     void onMousePressedChange(QMouseEvent *event);
     void onWheel(QWheelEvent *event);
+    void onKeyPressRelease(QKeyEvent *event);
 
 private:
     ImGuiWidget *widget;
