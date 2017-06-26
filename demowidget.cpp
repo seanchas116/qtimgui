@@ -1,18 +1,21 @@
 #include "demowidget.h"
+#include "imguirenderer.h"
 
-DemoWidget::DemoWidget(QWidget *parent) : ImGuiWidget(parent)
+DemoWidget::DemoWidget(QWidget *parent) : QOpenGLWidget(parent)
 {
 
 }
 
 void DemoWidget::initializeGL()
 {
-    ImGuiWidget::initializeGL();
     initializeOpenGLFunctions();
+    QtImGui::ImGuiRenderer::instance()->initialize(this);
 }
 
-void DemoWidget::renderImGui()
+void DemoWidget::paintGL()
 {
+    QtImGui::ImGuiRenderer::instance()->newFrame();
+
     // 1. Show a simple window
     // Tip: if we don't call ImGui::Begin()/ImGui::End() the widgets appears in a window automatically called "Debug"
     {
@@ -45,4 +48,6 @@ void DemoWidget::renderImGui()
     glViewport(0, 0, width(), height());
     glClearColor(clear_color.x, clear_color.y, clear_color.z, clear_color.w);
     glClear(GL_COLOR_BUFFER_BIT);
+
+    ImGui::Render();
 }

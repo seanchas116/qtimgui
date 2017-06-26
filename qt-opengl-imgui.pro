@@ -25,7 +25,6 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 SOURCES += \
         main.cpp \
-    imguiwidget.cpp \
     imgui/imgui_draw.cpp \
     imgui/imgui.cpp \
     demowidget.cpp \
@@ -33,7 +32,6 @@ SOURCES += \
     imguirenderer.cpp
 
 HEADERS += \
-    imguiwidget.h \
     demowidget.h \
     imguirenderer.h
 

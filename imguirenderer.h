@@ -1,29 +1,37 @@
 #pragma once
 
 #include <QOpenGLExtraFunctions>
+#include <QObject>
 #include <imgui.h>
-#include "imguiwidget.h"
+
+class QMouseEvent;
+class QWheelEvent;
+class QKeyEvent;
 
 namespace QtImGui {
 
-class ImGuiRenderer : QOpenGLExtraFunctions {
+class ImGuiRenderer : public QObject, QOpenGLExtraFunctions {
+    Q_OBJECT
 public:
-    ImGuiRenderer(ImGuiWidget *w) : widget(w) {}
-
-    void initialize();
-
-    void renderDrawList(ImDrawData *draw_data);
+    void initialize(QWidget *widget);
     void newFrame();
+
+    bool eventFilter(QObject *watched, QEvent *event);
+
+    static ImGuiRenderer *instance();
+
+private:
+    ImGuiRenderer() {}
 
     void onMousePressedChange(QMouseEvent *event);
     void onWheel(QWheelEvent *event);
     void onKeyPressRelease(QKeyEvent *event);
 
-private:
+    void renderDrawList(ImDrawData *draw_data);
     bool createFontsTexture();
     bool createDeviceObjects();
 
-    ImGuiWidget *widget;
+    QWidget *widget;
     double       g_Time = 0.0f;
     bool         g_MousePressed[3] = { false, false, false };
     float        g_MouseWheel = 0.0f;

@@ -1,7 +1,9 @@
 #include "imguirenderer.h"
 #include <QDateTime>
 #include <QMouseEvent>
-#include <QDebug>
+#include <QApplication>
+#include <QClipboard>
+#include <QWidget>
 
 namespace QtImGui {
 
@@ -29,15 +31,33 @@ QHash<int, ImGuiKey> keyMap = {
     { Qt::Key_Z, ImGuiKey_Z },
 };
 
+QByteArray g_currentClipboardText;
+
 }
 
-void ImGuiRenderer::initialize() {
+void ImGuiRenderer::initialize(QWidget *widget) {
+    this->widget = widget;
     initializeOpenGLFunctions();
 
     ImGuiIO &io = ImGui::GetIO();
     for (ImGuiKey key : keyMap.values()) {
         io.KeyMap[key] = key;
     }
+
+    io.RenderDrawListsFn = [](ImDrawData *drawData) {
+        instance()->renderDrawList(drawData);
+    };
+    io.SetClipboardTextFn = [](void *user_data, const char *text) {
+        Q_UNUSED(user_data);
+        QApplication::clipboard()->setText(text);
+    };
+    io.GetClipboardTextFn = [](void *user_data) {
+        Q_UNUSED(user_data);
+        g_currentClipboardText = QApplication::clipboard()->text().toUtf8();
+        return (const char *)g_currentClipboardText.data();
+    };
+
+    widget->installEventFilter(this);
 }
 
 void ImGuiRenderer::renderDrawList(ImDrawData *draw_data)
@@ -321,6 +341,34 @@ void ImGuiRenderer::onKeyPressRelease(QKeyEvent *event)
     io.KeyShift = event->modifiers() & Qt::ShiftModifier;
     io.KeyAlt = event->modifiers() & Qt::AltModifier;
     io.KeySuper = event->modifiers() & Qt::MetaModifier;
+}
+
+bool ImGuiRenderer::eventFilter(QObject *watched, QEvent *event)
+{
+    switch (event->type()) {
+    case QEvent::MouseButtonPress:
+    case QEvent::MouseButtonRelease:
+        this->onMousePressedChange(static_cast<QMouseEvent *>(event));
+        break;
+    case QEvent::Wheel:
+        this->onWheel(static_cast<QWheelEvent *>(event));
+        break;
+    case QEvent::KeyPress:
+    case QEvent::KeyRelease:
+        this->onKeyPressRelease(static_cast<QKeyEvent *>(event));
+        break;
+    default:
+        break;
+    }
+    return QObject::eventFilter(watched, event);
+}
+
+ImGuiRenderer* ImGuiRenderer::instance() {
+    static ImGuiRenderer* instance = nullptr;
+    if (!instance) {
+        instance = new ImGuiRenderer();
+    }
+    return instance;
 }
 
 }

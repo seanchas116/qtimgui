@@ -1,10 +1,10 @@
 #pragma once
 
-#include "imguiwidget.h"
+#include <QOpenGLWidget>
 #include <QOpenGLExtraFunctions>
 #include <imgui.h>
 
-class DemoWidget : public QtImGui::ImGuiWidget, private QOpenGLExtraFunctions
+class DemoWidget : public QOpenGLWidget, private QOpenGLExtraFunctions
 {
     Q_OBJECT
 public:
@@ -16,7 +16,7 @@ public slots:
 
 protected:
     void initializeGL() override;
-    void renderImGui() override;
+    void paintGL() override;
 
 private:
     bool show_test_window = true;
