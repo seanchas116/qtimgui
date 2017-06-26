@@ -316,6 +316,11 @@ void ImGuiRenderer::onKeyPressRelease(QKeyEvent *event)
             io.AddInputCharacter(text.at(0).unicode());
         }
     }
+
+    io.KeyCtrl = event->modifiers() & Qt::ControlModifier;
+    io.KeyShift = event->modifiers() & Qt::ShiftModifier;
+    io.KeyAlt = event->modifiers() & Qt::AltModifier;
+    io.KeySuper = event->modifiers() & Qt::MetaModifier;
 }
 
 }
