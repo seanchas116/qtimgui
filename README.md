@@ -18,8 +18,13 @@ protected:
     }
     void paintGL() override
     {
+        // you can do custom GL rendering as well in paintGL
+
         QtImGui::newFrame();
+
         ImGui::Text("Hello");
+        // more widgets...
+
         ImGui::Render();
     }
 };
