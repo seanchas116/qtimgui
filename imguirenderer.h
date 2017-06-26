@@ -13,8 +13,6 @@ public:
     void initialize();
 
     void renderDrawList(ImDrawData *draw_data);
-    bool createFontsTexture();
-    bool createDeviceObjects();
     void newFrame();
 
     void onMousePressedChange(QMouseEvent *event);
@@ -22,6 +20,9 @@ public:
     void onKeyPressRelease(QKeyEvent *event);
 
 private:
+    bool createFontsTexture();
+    bool createDeviceObjects();
+
     ImGuiWidget *widget;
     double       g_Time = 0.0f;
     bool         g_MousePressed[3] = { false, false, false };
