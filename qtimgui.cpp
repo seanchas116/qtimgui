@@ -269,14 +269,8 @@ void ImGuiRenderer::newFrame()
     ImGuiIO& io = ImGui::GetIO();
 
     // Setup display size (every frame to accommodate for window resizing)
-    int w, h;
-    int display_w, display_h;
-    // glfwGetWindowSize(g_Window, &w, &h);
-    // glfwGetFramebufferSize(g_Window, &display_w, &display_h);
-    w = display_w = m_window->width();
-    h = display_h = m_window->height();
-    io.DisplaySize = ImVec2((float)w, (float)h);
-    io.DisplayFramebufferScale = ImVec2(w > 0 ? ((float)display_w / w) : 0, h > 0 ? ((float)display_h / h) : 0);
+    io.DisplaySize = ImVec2(m_window->width(), m_window->height());
+    io.DisplayFramebufferScale = ImVec2(m_window->devicePixelRatioF(), m_window->devicePixelRatioF());
 
     // Setup time step
     double current_time =  QDateTime::currentMSecsSinceEpoch() / double(1000);
