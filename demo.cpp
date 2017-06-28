@@ -61,15 +61,20 @@ private:
 
 int main(int argc, char *argv[])
 {
+    // Use OpenGL 3 Core Profile
     QSurfaceFormat glFormat;
-    glFormat.setVersion(4, 1);
+    glFormat.setVersion(3, 3);
     glFormat.setProfile(QSurfaceFormat::CoreProfile);
     QSurfaceFormat::setDefaultFormat(glFormat);
 
     QApplication a(argc, argv);
+
+    // Show window
     DemoWindow w;
     w.resize(1280, 720);
     w.show();
+
+    // Update at 60 fps
     QTimer timer;
     QObject::connect(&timer, SIGNAL(timeout()), &w, SLOT(update()));
     timer.start(16);
