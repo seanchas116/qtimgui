@@ -4,6 +4,7 @@
 #include <QApplication>
 #include <QClipboard>
 #include <QWidget>
+#include <QDebug>
 
 namespace QtImGui {
 
@@ -331,10 +332,17 @@ void ImGuiRenderer::onKeyPressRelease(QKeyEvent *event)
         }
     }
 
+#ifdef Q_OS_MAC
+    io.KeyCtrl = event->modifiers() & Qt::MetaModifier;
+    io.KeyShift = event->modifiers() & Qt::ShiftModifier;
+    io.KeyAlt = event->modifiers() & Qt::AltModifier;
+    io.KeySuper = event->modifiers() & Qt::ControlModifier; // Comamnd key
+#else
     io.KeyCtrl = event->modifiers() & Qt::ControlModifier;
     io.KeyShift = event->modifiers() & Qt::ShiftModifier;
     io.KeyAlt = event->modifiers() & Qt::AltModifier;
     io.KeySuper = event->modifiers() & Qt::MetaModifier;
+#endif
 }
 
 bool ImGuiRenderer::eventFilter(QObject *watched, QEvent *event)
