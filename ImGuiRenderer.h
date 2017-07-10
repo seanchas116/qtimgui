@@ -10,13 +10,21 @@ class QKeyEvent;
 
 namespace QtImGui {
 
+class WindowWrapper {
+public:
+    virtual ~WindowWrapper() {}
+    virtual void installEventFilter(QObject *object) = 0;
+    virtual QSize size() const = 0;
+    virtual qreal devicePixelRatio() const = 0;
+    virtual bool isActive() const = 0;
+    virtual QPoint mapFromGlobal(const QPoint &p) const = 0;
+};
+
 class ImGuiRenderer : public QObject, QOpenGLExtraFunctions {
     Q_OBJECT
 public:
-    void initialize(QWidget *window);
+    void initialize(WindowWrapper *window);
     void newFrame();
-
-    QWidget *window() const { return m_window; }
 
     bool eventFilter(QObject *watched, QEvent *event);
 
@@ -33,7 +41,7 @@ private:
     bool createFontsTexture();
     bool createDeviceObjects();
 
-    QWidget *m_window;
+    std::unique_ptr<WindowWrapper> m_window;
     double       g_Time = 0.0f;
     bool         g_MousePressed[3] = { false, false, false };
     float        g_MouseWheel = 0.0f;
@@ -43,8 +51,5 @@ private:
     int          g_AttribLocationPosition = 0, g_AttribLocationUV = 0, g_AttribLocationColor = 0;
     unsigned int g_VboHandle = 0, g_VaoHandle = 0, g_ElementsHandle = 0;
 };
-
-void initialize(QWidget *window);
-void newFrame();
 
 }

@@ -1,12 +1,12 @@
 #include <QtImGui.h>
 #include <imgui.h>
-#include <QApplication>
+#include <QGuiApplication>
 #include <QTimer>
 #include <QSurfaceFormat>
-#include <QOpenGLWidget>
+#include <QOpenGLWindow>
 #include <QOpenGLExtraFunctions>
 
-class DemoWindow : public QOpenGLWidget, private QOpenGLExtraFunctions
+class DemoWindow : public QOpenGLWindow, private QOpenGLExtraFunctions
 {
 protected:
     void initializeGL() override
@@ -68,7 +68,7 @@ int main(int argc, char *argv[])
     glFormat.setProfile(QSurfaceFormat::CoreProfile);
     QSurfaceFormat::setDefaultFormat(glFormat);
 
-    QApplication a(argc, argv);
+    QGuiApplication a(argc, argv);
 
     // Show window
     DemoWindow w;

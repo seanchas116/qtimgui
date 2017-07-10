@@ -1,9 +1,9 @@
 #include "ImGuiRenderer.h"
 #include <QDateTime>
+#include <QGuiApplication>
 #include <QMouseEvent>
-#include <QApplication>
 #include <QClipboard>
-#include <QWidget>
+#include <QCursor>
 #include <QDebug>
 
 namespace QtImGui {
@@ -36,8 +36,8 @@ QByteArray g_currentClipboardText;
 
 }
 
-void ImGuiRenderer::initialize(QWidget *window) {
-    m_window = window;
+void ImGuiRenderer::initialize(WindowWrapper *window) {
+    m_window.reset(window);
     initializeOpenGLFunctions();
 
     ImGuiIO &io = ImGui::GetIO();
@@ -50,11 +50,11 @@ void ImGuiRenderer::initialize(QWidget *window) {
     };
     io.SetClipboardTextFn = [](void *user_data, const char *text) {
         Q_UNUSED(user_data);
-        QApplication::clipboard()->setText(text);
+        QGuiApplication::clipboard()->setText(text);
     };
     io.GetClipboardTextFn = [](void *user_data) {
         Q_UNUSED(user_data);
-        g_currentClipboardText = QApplication::clipboard()->text().toUtf8();
+        g_currentClipboardText = QGuiApplication::clipboard()->text().toUtf8();
         return (const char *)g_currentClipboardText.data();
     };
 
@@ -270,8 +270,8 @@ void ImGuiRenderer::newFrame()
     ImGuiIO& io = ImGui::GetIO();
 
     // Setup display size (every frame to accommodate for window resizing)
-    io.DisplaySize = ImVec2(m_window->width(), m_window->height());
-    io.DisplayFramebufferScale = ImVec2(m_window->devicePixelRatioF(), m_window->devicePixelRatioF());
+    io.DisplaySize = ImVec2(m_window->size().width(), m_window->size().height());
+    io.DisplayFramebufferScale = ImVec2(m_window->devicePixelRatio(), m_window->devicePixelRatio());
 
     // Setup time step
     double current_time =  QDateTime::currentMSecsSinceEpoch() / double(1000);
@@ -280,7 +280,7 @@ void ImGuiRenderer::newFrame()
 
     // Setup inputs
     // (we already got mouse wheel, keyboard keys & characters from glfw callbacks polled in glfwPollEvents())
-    if (m_window->isActiveWindow())
+    if (m_window->isActive())
     {
         auto pos = m_window->mapFromGlobal(QCursor::pos());
         io.MousePos = ImVec2(pos.x(), pos.y());   // Mouse position in screen coordinates (set to -1,-1 if no mouse / on another screen, etc.)
