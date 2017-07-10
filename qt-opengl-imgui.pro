@@ -27,10 +27,12 @@ SOURCES += \
     imgui/imgui_draw.cpp \
     imgui/imgui.cpp \
     imgui/imgui_demo.cpp \
-    qtimgui.cpp \
-    demo.cpp
+    demo/demo.cpp \
+    ImGuiRenderer.cpp \
+    QtImGui.cpp
 
 HEADERS += \
-    qtimgui.h
+    ImGuiRenderer.h \
+    QtImGui.h
 
 INCLUDEPATH += imgui

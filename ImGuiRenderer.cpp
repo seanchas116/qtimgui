@@ -1,4 +1,4 @@
-#include "qtimgui.h"
+#include "ImGuiRenderer.h"
 #include <QDateTime>
 #include <QMouseEvent>
 #include <QApplication>
@@ -371,14 +371,6 @@ ImGuiRenderer* ImGuiRenderer::instance() {
         instance = new ImGuiRenderer();
     }
     return instance;
-}
-
-void initialize(QWidget *window) {
-    ImGuiRenderer::instance()->initialize(window);
-}
-
-void newFrame() {
-    ImGuiRenderer::instance()->newFrame();
 }
 
 }

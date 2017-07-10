@@ -1,4 +1,5 @@
-#include "qtimgui.h"
+#include "QtImGui.h"
+#include <imgui.h>
 #include <QApplication>
 #include <QTimer>
 #include <QSurfaceFormat>

@@ -4,7 +4,7 @@ Qt (QOpenGLWidget) backend for [ImGui](https://github.com/ocornut/imgui)
 
 ## How to use
 
-* Add `qtimgui.cpp` and `qtimgui.h` to your project
+* Add QtImGui sources and headers to your project
 * Add ImGui to your project
 * Subclass `QOpenGLWidget` and:
 
