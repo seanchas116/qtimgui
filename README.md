@@ -1,15 +1,15 @@
 # qt-opengl-imgui
 
-Qt (QOpenGLWidget) backend for [ImGui](https://github.com/ocornut/imgui)
+Qt (QOpenGLWidget / QOpenGLWindow) backend for [ImGui](https://github.com/ocornut/imgui)
 
 ## How to use
 
 * Add QtImGui sources and headers to your project
 * Add ImGui to your project
-* Subclass `QOpenGLWidget` and:
+* Subclass `QOpenGLWindow` or `QOpenGLWidget` and:
 
 ```cpp
-class DemoWindow : public QOpenGLWidget
+class DemoWindow : public QOpenGLWindow
 {
 protected:
     void initializeGL() override
