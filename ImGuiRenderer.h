@@ -3,6 +3,7 @@
 #include <QOpenGLExtraFunctions>
 #include <QObject>
 #include <imgui.h>
+#include <memory>
 
 class QMouseEvent;
 class QWheelEvent;
