@@ -1,4 +1,4 @@
-# qt-opengl-imgui
+# QtImGui
 
 Qt (QOpenGLWidget / QOpenGLWindow) backend for [ImGui](https://github.com/ocornut/imgui)
 
