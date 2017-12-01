@@ -1,0 +1,22 @@
+{
+  "name": "com.github.seanchas116.qtimgui",
+  "description": "",
+  "author": {
+    "name": "Ryohei Ikegami",
+    "email": "iofg2100@gmail.com"
+  },
+  "repository": {
+    "type": "GITHUB",
+    "url": "git@github.com:seanchas116/qtimgui.git"
+  },
+  "version": {
+    "label": "0.0.1",
+    "revision": "",
+    "fingerprint": ""
+  },
+  "dependencies": [
+  ],
+  "license": "MIT",
+  "pri_filename": "qtimgui.pri",
+  "webpage": ""
+}
