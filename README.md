@@ -5,7 +5,8 @@ Qt (QOpenGLWidget / QOpenGLWindow) backend for [ImGui](https://github.com/ocornu
 ## How to use
 
 * Add QtImGui sources and headers to your project
-* Add ImGui to your project
+    * If you are using git submodule, run `git submodule update --init --recursive` to ensure that the inner submodule is initialized as well.
+* Add `include(path/to/qtimgui.pri)` to youre `.pro` file
 * Subclass `QOpenGLWindow` or `QOpenGLWidget` and:
 
 ```cpp
