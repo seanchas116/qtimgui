@@ -17,6 +17,6 @@
   "dependencies": [
   ],
   "license": "MIT",
-  "pri_filename": "com_github_seanchas116_qtimgui.pri",
+  "pri_filename": "qtimgui.pri",
   "webpage": ""
 }
