@@ -40,6 +40,8 @@ void ImGuiRenderer::initialize(WindowWrapper *window) {
     m_window.reset(window);
     initializeOpenGLFunctions();
 
+    ImGui::CreateContext();
+
     ImGuiIO &io = ImGui::GetIO();
     for (ImGuiKey key : keyMap.values()) {
         io.KeyMap[key] = key;
