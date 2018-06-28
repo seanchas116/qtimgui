@@ -2,6 +2,10 @@
 
 Qt (QOpenGLWidget / QOpenGLWindow) backend for [ImGui](https://github.com/ocornut/imgui)
 
+It enables ImGui to run in QOpenGLWidget / QOpenGLWindow.
+
+[![https://gyazo.com/eb68699c96b9147cca3d5ea9fadfc263](https://i.gyazo.com/eb68699c96b9147cca3d5ea9fadfc263.gif)](https://gyazo.com/eb68699c96b9147cca3d5ea9fadfc263)
+
 ## How to use
 
 * Add QtImGui sources and headers to your project

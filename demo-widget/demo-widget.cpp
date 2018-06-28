@@ -72,6 +72,7 @@ int main(int argc, char *argv[])
 
     // Show window
     DemoWindow w;
+    w.setWindowTitle("QtImGui widget example");
     w.resize(1280, 720);
     w.show();
 
