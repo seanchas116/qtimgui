@@ -34,3 +34,5 @@ protected:
     }
 };
 ```
+
+See [QOpenGLWidget example](demo-widget/demo-widget.cpp) and [QOpenGLWindow example](/demo-window/demo-window.cpp) for details.
