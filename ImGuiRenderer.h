@@ -2,6 +2,7 @@
 
 #include <QOpenGLExtraFunctions>
 #include <QObject>
+#include <QPoint>
 #include <imgui.h>
 #include <memory>
 
@@ -45,7 +46,7 @@ private:
     std::unique_ptr<WindowWrapper> m_window;
     double       g_Time = 0.0f;
     bool         g_MousePressed[3] = { false, false, false };
-    float        g_MouseWheel = 0.0f;
+    QPointF      g_MouseWheel;
     GLuint       g_FontTexture = 0;
     int          g_ShaderHandle = 0, g_VertHandle = 0, g_FragHandle = 0;
     int          g_AttribLocationTex = 0, g_AttribLocationProjMtx = 0;

@@ -297,8 +297,9 @@ void ImGuiRenderer::newFrame()
         io.MouseDown[i] = g_MousePressed[i];
     }
 
-    io.MouseWheel = g_MouseWheel;
-    g_MouseWheel = 0.0f;
+    io.MouseWheelH = g_MouseWheel.x();
+    io.MouseWheel = g_MouseWheel.y();
+    g_MouseWheel = QPointF();
 
     // Hide OS mouse cursor if ImGui is drawing it
     // glfwSetInputMode(g_Window, GLFW_CURSOR, io.MouseDrawCursor ? GLFW_CURSOR_HIDDEN : GLFW_CURSOR_NORMAL);
@@ -317,7 +318,7 @@ void ImGuiRenderer::onMousePressedChange(QMouseEvent *event)
 void ImGuiRenderer::onWheel(QWheelEvent *event)
 {
     // 5 lines per unit
-    g_MouseWheel += event->pixelDelta().y() / (5.0 * ImGui::GetTextLineHeight());
+    g_MouseWheel += QPointF(event->pixelDelta()) / (5.0 * ImGui::GetTextLineHeight());
 }
 
 void ImGuiRenderer::onKeyPressRelease(QKeyEvent *event)
