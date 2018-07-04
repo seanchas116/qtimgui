@@ -46,7 +46,8 @@ private:
     std::unique_ptr<WindowWrapper> m_window;
     double       g_Time = 0.0f;
     bool         g_MousePressed[3] = { false, false, false };
-    QPointF      g_MouseWheel;
+    float        g_MouseWheel;
+    float        g_MouseWheelH;
     GLuint       g_FontTexture = 0;
     int          g_ShaderHandle = 0, g_VertHandle = 0, g_FragHandle = 0;
     int          g_AttribLocationTex = 0, g_AttribLocationProjMtx = 0;
