@@ -23,6 +23,7 @@ QHash<int, ImGuiKey> keyMap = {
     { Qt::Key_Delete, ImGuiKey_Delete },
     { Qt::Key_Backspace, ImGuiKey_Backspace },
     { Qt::Key_Enter, ImGuiKey_Enter },
+    { Qt::Key_Return, ImGuiKey_Enter },
     { Qt::Key_Escape, ImGuiKey_Escape },
     { Qt::Key_A, ImGuiKey_A },
     { Qt::Key_C, ImGuiKey_C },
