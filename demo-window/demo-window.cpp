@@ -43,7 +43,7 @@ protected:
         if (show_test_window)
         {
             ImGui::SetNextWindowPos(ImVec2(650, 20), ImGuiCond_FirstUseEver);
-            ImGui::ShowTestWindow();
+            ImGui::ShowDemoWindow();
         }
 
         // Do render before ImGui UI is rendered
