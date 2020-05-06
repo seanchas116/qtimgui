@@ -320,7 +320,7 @@ void ImGuiRenderer::onMousePressedChange(QMouseEvent *event)
 void ImGuiRenderer::onWheel(QWheelEvent *event)
 {
     // Handle horizontal component
-    if(event->angleDelta().x() == 0.0)
+    if(event->pixelDelta().x() != 0)
     {
         g_MouseWheelH += event->pixelDelta().x() / (ImGui::GetTextLineHeight());
     } else {
@@ -329,13 +329,13 @@ void ImGuiRenderer::onWheel(QWheelEvent *event)
     }
 
     // Handle vertical component
-     if(event->angleDelta().y() == 0.0)
-     {
-         // 5 lines per unit
-         g_MouseWheel += event->pixelDelta().y() / (5.0 * ImGui::GetTextLineHeight());
-     } else {
-         // Magic number of 120 comes from Qt doc on QWheelEvent::pixelDelta()
-         g_MouseWheel += event->angleDelta().y() / 120;
+    if(event->pixelDelta().y() != 0)
+    {
+        // 5 lines per unit
+        g_MouseWheel += event->pixelDelta().y() / (5.0 * ImGui::GetTextLineHeight());
+    } else {
+        // Magic number of 120 comes from Qt doc on QWheelEvent::pixelDelta()
+        g_MouseWheel += event->angleDelta().y() / 120;
     }
 }
 
