@@ -62,10 +62,13 @@ private:
 
 int main(int argc, char *argv[])
 {
-    // Use OpenGL 3 Core Profile
+    // Use OpenGL 3 Core Profile, when available
     QSurfaceFormat glFormat;
-    glFormat.setVersion(3, 3);
-    glFormat.setProfile(QSurfaceFormat::CoreProfile);
+    if (QOpenGLContext::openGLModuleType() == QOpenGLContext::LibGL)
+    {
+        glFormat.setVersion(3, 3);
+        glFormat.setProfile(QSurfaceFormat::CoreProfile);
+    }
     QSurfaceFormat::setDefaultFormat(glFormat);
 
     QApplication a(argc, argv);

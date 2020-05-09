@@ -6,6 +6,17 @@
 #include <QCursor>
 #include <QDebug>
 
+#ifdef ANDROID
+#define GL_VERTEX_ARRAY_BINDING           0x85B5 // Missing in android as of May 2020
+#define USE_GLSL_ES
+#endif
+
+#ifdef USE_GLSL_ES
+#define IMGUIRENDERER_GLSL_VERSION "#version 300 es\n"
+#else
+#define IMGUIRENDERER_GLSL_VERSION "#version 330\n"
+#endif
+
 namespace QtImGui {
 
 namespace {
@@ -197,7 +208,7 @@ bool ImGuiRenderer::createDeviceObjects()
     glGetIntegerv(GL_VERTEX_ARRAY_BINDING, &last_vertex_array);
 
     const GLchar *vertex_shader =
-        "#version 330\n"
+        IMGUIRENDERER_GLSL_VERSION
         "uniform mat4 ProjMtx;\n"
         "in vec2 Position;\n"
         "in vec2 UV;\n"
@@ -212,7 +223,7 @@ bool ImGuiRenderer::createDeviceObjects()
         "}\n";
 
     const GLchar* fragment_shader =
-        "#version 330\n"
+        IMGUIRENDERER_GLSL_VERSION
         "uniform sampler2D Texture;\n"
         "in vec2 Frag_UV;\n"
         "in vec4 Frag_Color;\n"
