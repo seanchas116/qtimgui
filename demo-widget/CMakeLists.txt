@@ -1,0 +1,9 @@
+add_executable(
+  qt_imgui_demo_widget
+  demo-widget.cpp
+)
+target_link_libraries(
+  qt_imgui_demo_widget 
+  PRIVATE 
+  qt_imgui_widgets
+  )
