@@ -224,6 +224,7 @@ bool ImGuiRenderer::createDeviceObjects()
 
     const GLchar* fragment_shader =
         IMGUIRENDERER_GLSL_VERSION
+        "precision mediump float;"
         "uniform sampler2D Texture;\n"
         "in vec2 Frag_UV;\n"
         "in vec4 Frag_Color;\n"
