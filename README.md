@@ -36,3 +36,13 @@ protected:
 ```
 
 See [QOpenGLWidget example](demo-widget/demo-widget.cpp) and [QOpenGLWindow example](/demo-window/demo-window.cpp) for details.
+
+## Specific notes for Android, when using cmake
+
+Two projects are provided: `qtimgui.pro` and `CMakaLists.txt`.
+
+When using cmake under Android, this project will uses [qt-android-cmake](https://github.com/LaurentGomila/qt-android-cmake), which is a CMake utility for building and deploying Qt based applications on Android without QtCreator.
+
+*In order to successfuly deploy the app to a device, the cmake variable ANDROID_NATIVE_API_LEVEL should be >= 26.
+ You will need to set it via the cmake command line, or inside Qt Creator (in the project view).*
+
