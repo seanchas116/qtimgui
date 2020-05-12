@@ -6,6 +6,17 @@
 #include <QCursor>
 #include <QDebug>
 
+#ifdef ANDROID
+#define GL_VERTEX_ARRAY_BINDING           0x85B5 // Missing in android as of May 2020
+#define USE_GLSL_ES
+#endif
+
+#ifdef USE_GLSL_ES
+#define IMGUIRENDERER_GLSL_VERSION "#version 300 es\n"
+#else
+#define IMGUIRENDERER_GLSL_VERSION "#version 330\n"
+#endif
+
 namespace QtImGui {
 
 namespace {
@@ -137,7 +148,7 @@ void ImGuiRenderer::renderDrawList(ImDrawData *draw_data)
             }
             else
             {
-                glBindTexture(GL_TEXTURE_2D, (GLuint)(intptr_t)pcmd->TextureId);
+                glBindTexture(GL_TEXTURE_2D, (GLuint)(size_t)pcmd->TextureId);
                 glScissor((int)pcmd->ClipRect.x, (int)(fb_height - pcmd->ClipRect.w), (int)(pcmd->ClipRect.z - pcmd->ClipRect.x), (int)(pcmd->ClipRect.w - pcmd->ClipRect.y));
                 glDrawElements(GL_TRIANGLES, (GLsizei)pcmd->ElemCount, sizeof(ImDrawIdx) == 2 ? GL_UNSIGNED_SHORT : GL_UNSIGNED_INT, idx_buffer_offset);
             }
@@ -180,7 +191,7 @@ bool ImGuiRenderer::createFontsTexture()
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, pixels);
 
     // Store our identifier
-    io.Fonts->TexID = (void *)(intptr_t)g_FontTexture;
+    io.Fonts->TexID = (void *)(size_t)g_FontTexture;
 
     // Restore state
     glBindTexture(GL_TEXTURE_2D, last_texture);
@@ -197,7 +208,7 @@ bool ImGuiRenderer::createDeviceObjects()
     glGetIntegerv(GL_VERTEX_ARRAY_BINDING, &last_vertex_array);
 
     const GLchar *vertex_shader =
-        "#version 330\n"
+        IMGUIRENDERER_GLSL_VERSION
         "uniform mat4 ProjMtx;\n"
         "in vec2 Position;\n"
         "in vec2 UV;\n"
@@ -212,7 +223,8 @@ bool ImGuiRenderer::createDeviceObjects()
         "}\n";
 
     const GLchar* fragment_shader =
-        "#version 330\n"
+        IMGUIRENDERER_GLSL_VERSION
+        "precision mediump float;"
         "uniform sampler2D Texture;\n"
         "in vec2 Frag_UV;\n"
         "in vec4 Frag_Color;\n"
