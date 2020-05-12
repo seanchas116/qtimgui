@@ -61,3 +61,4 @@ add_subdirectory(demo-window)
 add_subdirectory(demo-widget)
 # Demo with ImGuiRunner
 add_subdirectory(demo-runner)
+add_subdirectory(demo-runner-minimal)
