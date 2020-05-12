@@ -1,8 +1,11 @@
-add_executable(
-  qt_imgui_demo_window
-  demo-window.cpp
-)
-target_link_libraries(qt_imgui_demo_window 
-  PRIVATE 
-  qt_imgui_quick
-)
+if (ANDROID)
+  add_library(qt_imgui_demo_window SHARED demo-window.cpp)
+else()
+  add_executable(qt_imgui_demo_window demo-window.cpp)
+endif()
+target_link_libraries(qt_imgui_demo_window  PRIVATE qt_imgui_quick)
+
+if(ANDROID)
+    include(${CMAKE_CURRENT_LIST_DIR}/../tools/qt-android-cmake/AddQtAndroidApk.cmake)
+    add_qt_android_apk(qt_imgui_demo_window_apk qt_imgui_demo_window)
+endif()

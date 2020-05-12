@@ -1,3 +1,6 @@
 [submodule "imgui"]
 	path = imgui
 	url = https://github.com/ocornut/imgui.git
+[submodule "tools/qt-android-cmake"]
+	path = tools/qt-android-cmake
+	url = https://github.com/LaurentGomila/qt-android-cmake.git
