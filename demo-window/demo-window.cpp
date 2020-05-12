@@ -62,6 +62,8 @@ private:
 
 int main(int argc, char *argv[])
 {
+    QGuiApplication a(argc, argv);
+
     // Use OpenGL 3 Core Profile, when available
     QSurfaceFormat glFormat;
     if (QOpenGLContext::openGLModuleType() == QOpenGLContext::LibGL)
@@ -70,8 +72,6 @@ int main(int argc, char *argv[])
         glFormat.setProfile(QSurfaceFormat::CoreProfile);
     }
     QSurfaceFormat::setDefaultFormat(glFormat);
-
-    QGuiApplication a(argc, argv);
 
     // Show window
     DemoWindow w;
