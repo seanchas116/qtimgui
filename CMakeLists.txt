@@ -22,6 +22,8 @@ set(
     qt_imgui_sources
     ImGuiRenderer.h
     ImGuiRenderer.cpp
+    QtImGuiRunner.h
+    QtImGuiRunner.cpp
     QtImGui.h
     QtImGui.cpp
 )
@@ -57,3 +59,5 @@ target_compile_definitions(qt_imgui_widgets PUBLIC QT_WIDGETS_LIB)
 add_subdirectory(demo-window)
 # Demo with classic widgets
 add_subdirectory(demo-widget)
+# Demo with ImGuiRunner
+add_subdirectory(demo-runner)
