@@ -8,8 +8,9 @@ It enables ImGui to run in QOpenGLWidget / QOpenGLWindow.
 
 ## How to use
 
+### By subclassing QOpenGLWindow or QOpenGlWidget
 * Add QtImGui sources and headers to your project
-    * If you are using git submodule, run `git submodule update --init --recursive` to ensure that the inner submodule is initialized as well.
+    * If you are using git submodule, run `git submodule update --init --recursive` to ensure that the inner submodules are initialized as well.
 * Add `include(path/to/qtimgui.pri)` to youre `.pro` file
 * Subclass `QOpenGLWindow` or `QOpenGLWidget` and:
 
@@ -36,6 +37,18 @@ protected:
 ```
 
 See [QOpenGLWidget example](demo-widget/demo-widget.cpp) and [QOpenGLWindow example](/demo-window/demo-window.cpp) for details.
+
+### By using QtImGuiRunner (and cmake) 
+
+QtImGuiRunner enables you to write an app with *very few* lines of code, by simply registering 
+a gui loop function or lambda: 
+![aa](https://i.gyazo.com/95a925b8c3c8e4e96a7c8a092097bd2e.gif)
+
+To use it:
+1. Adapt this [CMakeLists](demo-runner/CMakeLists.txt) to your needs
+2. Create a gui loop function and [pass it to QtImGuiRunner::Run()](demo-runner-minimal/demo-runner-minimal.cpp)
+
+See [demo-runner](demo-runner) and [demo-runner-minimal](demo-runner-minimal) for more details.
 
 ## Specific notes for Android, when using cmake
 

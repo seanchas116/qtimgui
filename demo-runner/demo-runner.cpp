@@ -1,5 +1,6 @@
 #include <QtImGuiRunner.h>
 
+// This struct store the entire application state
 struct ApplicationState
 {
     double f =  0.5;
@@ -7,6 +8,7 @@ struct ApplicationState
     bool show_test_window = false;
 };
 
+// This function is the app gui loop, and will modify the application state
 bool GuiLoop(ApplicationState &state)
 {
     // 1. Show a simple window
@@ -40,25 +42,24 @@ bool GuiLoop(ApplicationState &state)
     if (ImGui::Button("Quit"))
         return true;
 
-    return false;
+    return false; // Return false if the applicatio shall continue
 }
-
 
 int main()
 {
-    //
-    // First example:
-    // - We create a lambda that capture an application context
-    // - By default a full background window will be provided
-    //
-    // Since we are calling QtImGuiRunner::RunWithQuit, we can add a "Quit" button
-    // To cause the application to quit, simply return true at the end of the GuiLoop function or lambda
+    // Customize the app window
     QtImGuiRunner::AppWindowParams params;
     params.window_title = "Hello";
-    params.show_maximized = true;
-    params.provide_full_background_window = false;
+    params.show_maximized = true; // Make the app window maximized
+    params.provide_full_background_window = true;// By default a full background window will be provided
+
     ApplicationState state;
+    // - We create a lambda that captures the application state
     auto gui_loop_lambda = [&state]() {
+        // Since we are calling QtImGuiRunner::RunWithQuit,
+        // we can add a "Quit" button
+        // To cause the application to quit, simply return true
+        // at the end of the GuiLoop function or lambda
         return GuiLoop(state);
     };
     QtImGuiRunner::RunWithQuit(gui_loop_lambda, params);

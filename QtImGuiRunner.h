@@ -39,20 +39,23 @@ struct AppWindowParams
     ImVec4 clear_color = ImColor(114, 144, 154);
 };
 
+// Call this for a standard application
 int Run(
     GuiLoopFunction guiLoopFunction,
     const AppWindowParams &params,
-    int argc = 0,
-    char **argv = nullptr
+    int argc = 0,          // These argc and argv
+    char **argv = nullptr  // params will be passed to QGuiApplication
     );
 
+// Call this if you want to be able to
+// quit the app via code: 
+// guiLoopFunction shall return true 
+// when exit is required
 int RunWithQuit(
     GuiLoopWithExitFunction guiLoopFunction,
     const AppWindowParams &params,
     int argc = 0,
     char **argv = nullptr
     );
-
-// void BringMainWindowToTop();
 
 } // namespace QtImGuiRunner
