@@ -43,6 +43,6 @@ Two projects are provided: `qtimgui.pro` and `CMakaLists.txt`.
 
 When using cmake under Android, this project will uses [qt-android-cmake](https://github.com/LaurentGomila/qt-android-cmake), which is a CMake utility for building and deploying Qt based applications on Android without QtCreator.
 
-*In order to successfuly deploy the app to a device, the cmake variable ANDROID_NATIVE_API_LEVEL should be >= 26.
+*In order to successfuly deploy the app to a device, the cmake variable ANDROID_NATIVE_API_LEVEL should elevated to 21 or 26 (depending on the native levels installed in your android sdk)
  You will need to set it via the cmake command line, or inside Qt Creator (in the project view).*
 
