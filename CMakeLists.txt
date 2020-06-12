@@ -6,17 +6,21 @@ set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
 find_package(Qt5 COMPONENTS Core Quick Gui Widgets Svg REQUIRED)
 
-# imgui library: bare imgui
-add_library(imgui
-  STATIC
-  imgui/imconfig.h
-  imgui/imgui_demo.cpp
-  imgui/imgui_draw.cpp
-  imgui/imgui_internal.h
-  imgui/imgui_widgets.cpp
-  imgui/imgui.cpp
-)
-target_include_directories(imgui PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/imgui)
+# imgui library: imgui is build by default, but you can
+# provide your own version by setting QTIMGUI_BUILD_IMGUI to OFF
+option(QTIMGUI_BUILD_IMGUI "Use imgui provided as qtimgui submodule" ON)
+if (QTIMGUI_BUILD_IMGUI)
+    add_library(imgui
+      STATIC
+      imgui/imconfig.h
+      imgui/imgui_demo.cpp
+      imgui/imgui_draw.cpp
+      imgui/imgui_internal.h
+      imgui/imgui_widgets.cpp
+      imgui/imgui.cpp
+    )
+    target_include_directories(imgui PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/imgui)
+endif(QTIMGUI_BUILD_IMGUI)
 
 set(
     qt_imgui_sources
