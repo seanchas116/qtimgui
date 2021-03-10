@@ -52,6 +52,7 @@ protected:
         glClear(GL_COLOR_BUFFER_BIT);
 
         ImGui::Render();
+        QtImGui::render();
     }
 
 private:

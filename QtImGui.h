@@ -11,5 +11,6 @@ void initialize(QWidget *window);
 
 void initialize(QWindow *window);
 void newFrame();
+void render();
 
 }
