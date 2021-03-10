@@ -5,6 +5,7 @@
 #include <QSurfaceFormat>
 #include <QOpenGLWidget>
 #include <QOpenGLExtraFunctions>
+#include <implot.h>
 
 class DemoWindow : public QOpenGLWidget, private QOpenGLExtraFunctions
 {
@@ -42,8 +43,12 @@ protected:
         // 3. Show the ImGui test window. Most of the sample code is in ImGui::ShowTestWindow()
         if (show_test_window)
         {
+          ImPlot::CreateContext();
             ImGui::SetNextWindowPos(ImVec2(650, 20), ImGuiCond_FirstUseEver);
-            ImGui::ShowDemoWindow();
+            ImGui::Begin("ImPlot Window", &show_test_window);
+            ImPlot::ShowDemoWindow(&show_test_window);
+            ImGui::End();
+            ImPlot::DestroyContext();
         }
 
         // Do render before ImGui UI is rendered
