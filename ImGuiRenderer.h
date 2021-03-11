@@ -27,7 +27,7 @@ class ImGuiRenderer : public QObject, QOpenGLExtraFunctions {
 public:
     void initialize(WindowWrapper *window);
     void newFrame();
-
+    void render();
     bool eventFilter(QObject *watched, QEvent *event);
 
     static ImGuiRenderer *instance();

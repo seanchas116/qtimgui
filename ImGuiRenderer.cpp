@@ -42,6 +42,7 @@ QHash<int, ImGuiKey> keyMap = {
     { Qt::Key_X, ImGuiKey_X },
     { Qt::Key_Y, ImGuiKey_Y },
     { Qt::Key_Z, ImGuiKey_Z },
+    { Qt::MiddleButton, ImGuiMouseButton_Middle }
 };
 
 QByteArray g_currentClipboardText;
@@ -58,10 +59,10 @@ void ImGuiRenderer::initialize(WindowWrapper *window) {
     for (ImGuiKey key : keyMap.values()) {
         io.KeyMap[key] = key;
     }
-
-    io.RenderDrawListsFn = [](ImDrawData *drawData) {
-        instance()->renderDrawList(drawData);
-    };
+    
+    // io.RenderDrawListsFn = [](ImDrawData *drawData) {
+    //    instance()->renderDrawList(drawData);
+    // };
     io.SetClipboardTextFn = [](void *user_data, const char *text) {
         Q_UNUSED(user_data);
         QGuiApplication::clipboard()->setText(text);
@@ -320,6 +321,12 @@ void ImGuiRenderer::newFrame()
 
     // Start the frame
     ImGui::NewFrame();
+}
+
+void ImGuiRenderer::render()
+{
+  auto drawData = ImGui::GetDrawData();
+  renderDrawList(drawData);
 }
 
 void ImGuiRenderer::onMousePressedChange(QMouseEvent *event)

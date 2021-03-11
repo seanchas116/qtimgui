@@ -4,6 +4,7 @@ else()
     add_executable(qt_imgui_demo_widget demo-widget.cpp)
 endif()
 target_link_libraries(qt_imgui_demo_widget PRIVATE qt_imgui_widgets)
+target_link_libraries(qt_imgui_demo_widget PRIVATE implot)
 
 if(ANDROID)
     include(${CMAKE_CURRENT_LIST_DIR}/../tools/qt-android-cmake/AddQtAndroidApk.cmake)

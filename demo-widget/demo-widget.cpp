@@ -5,6 +5,7 @@
 #include <QSurfaceFormat>
 #include <QOpenGLWidget>
 #include <QOpenGLExtraFunctions>
+#include <implot.h>
 
 class DemoWindow : public QOpenGLWidget, private QOpenGLExtraFunctions
 {
@@ -25,25 +26,25 @@ protected:
             ImGui::Text("Hello, world!");
             ImGui::SliderFloat("float", &f, 0.0f, 1.0f);
             ImGui::ColorEdit3("clear color", (float*)&clear_color);
-            if (ImGui::Button("Test Window")) show_test_window ^= 1;
-            if (ImGui::Button("Another Window")) show_another_window ^= 1;
+            if (ImGui::Button("ImGui Demo")) show_imgui_demo_window ^= 1;
+            if (ImGui::Button("ImPlot Demo")) show_implot_demo_window ^= 1;
             ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
         }
 
         // 2. Show another simple window, this time using an explicit Begin/End pair
-        if (show_another_window)
+        if (show_imgui_demo_window)
         {
             ImGui::SetNextWindowSize(ImVec2(200,100), ImGuiCond_FirstUseEver);
-            ImGui::Begin("Another Window", &show_another_window);
-            ImGui::Text("Hello");
-            ImGui::End();
+            ImGui::ShowDemoWindow(&show_imgui_demo_window);
         }
 
         // 3. Show the ImGui test window. Most of the sample code is in ImGui::ShowTestWindow()
-        if (show_test_window)
+        if (show_implot_demo_window)
         {
             ImGui::SetNextWindowPos(ImVec2(650, 20), ImGuiCond_FirstUseEver);
-            ImGui::ShowDemoWindow();
+            ImPlot::CreateContext();
+            ImPlot::ShowDemoWindow(&show_implot_demo_window);
+            ImPlot::DestroyContext();
         }
 
         // Do render before ImGui UI is rendered
@@ -52,11 +53,12 @@ protected:
         glClear(GL_COLOR_BUFFER_BIT);
 
         ImGui::Render();
+        QtImGui::render();
     }
 
 private:
-    bool show_test_window = true;
-    bool show_another_window = false;
+    bool show_imgui_demo_window = true;
+    bool show_implot_demo_window = false;
     ImVec4 clear_color = ImColor(114, 144, 154);
 };
 

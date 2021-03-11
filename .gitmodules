@@ -4,3 +4,6 @@
 [submodule "tools/qt-android-cmake"]
 	path = tools/qt-android-cmake
 	url = https://github.com/LaurentGomila/qt-android-cmake.git
+[submodule "implot"]
+	path = implot
+	url = https://github.com/epezent/implot.git
