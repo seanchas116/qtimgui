@@ -23,12 +23,16 @@ class DemoWindow
     auto* timer = new QTimer(this);
     QObject::connect(timer, SIGNAL(timeout()), this, SLOT(update()));
     timer->start(16);
+
+    // create plot context
+    ctx = ImPlot::CreateContext();
   }
   void paintGL() override
   {
     QtImGui::newFrame(ref);
+    ImPlot::SetCurrentContext(ctx);
 
-    static bool             use_work_area = true;
+    static bool             use_work_area = false;
     static ImGuiWindowFlags flags =
       ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoMove
       | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoSavedSettings;
@@ -41,7 +45,6 @@ class DemoWindow
     ImGui::SetNextWindowSize(use_work_area ? viewport->WorkSize : viewport->Size);
 
     if (ImGui::Begin("Example: Fullscreen window", nullptr, flags)) {
-      ImPlot::CreateContext();
       ImGui::BulletText("Click and drag the horizontal and vertical lines.");
 
       ImGui::Checkbox("Show Labels##1", &show_labels);
@@ -76,12 +79,13 @@ class DemoWindow
   ImVec4             clear_color = ImColor(114, 144, 154);
   QtImGui::RenderRef ref         = nullptr;
 
-  double x1          = 0.2;
-  double x2          = 0.8;
-  double y1          = 0.25;
-  double y2          = 0.75;
-  double f           = 0.1;
-  bool   show_labels = true;
+  double         x1          = 0.2;
+  double         x2          = 0.8;
+  double         y1          = 0.25;
+  double         y2          = 0.75;
+  double         f           = 0.1;
+  bool           show_labels = true;
+  ImPlotContext* ctx         = nullptr;
 };
 
 int main(int argc, char* argv[])
