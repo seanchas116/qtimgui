@@ -53,7 +53,8 @@ void ImGuiRenderer::initialize(WindowWrapper *window) {
     m_window.reset(window);
     initializeOpenGLFunctions();
 
-    ImGui::CreateContext();
+    g_ctx = ImGui::CreateContext();
+    ImGui::SetCurrentContext(g_ctx);
 
     ImGuiIO &io = ImGui::GetIO();
     for (ImGuiKey key : keyMap.values()) {
@@ -78,6 +79,9 @@ void ImGuiRenderer::initialize(WindowWrapper *window) {
 
 void ImGuiRenderer::renderDrawList(ImDrawData *draw_data)
 {
+    // Select current context
+    ImGui::SetCurrentContext(g_ctx);
+
     // Avoid rendering when minimized, scale coordinates for retina displays (screen coordinates != framebuffer coordinates)
     ImGuiIO& io = ImGui::GetIO();
     int fb_width = (int)(io.DisplaySize.x * io.DisplayFramebufferScale.x);
@@ -176,6 +180,9 @@ void ImGuiRenderer::renderDrawList(ImDrawData *draw_data)
 
 bool ImGuiRenderer::createFontsTexture()
 {
+    // Select current context
+    ImGui::SetCurrentContext(g_ctx);
+
     // Build texture atlas
     ImGuiIO& io = ImGui::GetIO();
     unsigned char* pixels;
@@ -202,6 +209,9 @@ bool ImGuiRenderer::createFontsTexture()
 
 bool ImGuiRenderer::createDeviceObjects()
 {
+    // Select current context
+    ImGui::SetCurrentContext(g_ctx);
+
     // Backup GL state
     GLint last_texture, last_array_buffer, last_vertex_array;
     glGetIntegerv(GL_TEXTURE_BINDING_2D, &last_texture);
@@ -280,6 +290,9 @@ bool ImGuiRenderer::createDeviceObjects()
 
 void ImGuiRenderer::newFrame()
 {
+    // Select current context
+    ImGui::SetCurrentContext(g_ctx);
+
     if (!g_FontTexture)
         createDeviceObjects();
 
@@ -325,8 +338,22 @@ void ImGuiRenderer::newFrame()
 
 void ImGuiRenderer::render()
 {
+  // Select current context
+  ImGui::SetCurrentContext(g_ctx);
+
   auto drawData = ImGui::GetDrawData();
   renderDrawList(drawData);
+}
+
+ImGuiRenderer::ImGuiRenderer()
+  : g_ctx(nullptr)
+{
+}
+
+ImGuiRenderer::~ImGuiRenderer()
+{
+  // remove this context
+  ImGui::DestroyContext(g_ctx);
 }
 
 void ImGuiRenderer::onMousePressedChange(QMouseEvent *event)
@@ -338,6 +365,9 @@ void ImGuiRenderer::onMousePressedChange(QMouseEvent *event)
 
 void ImGuiRenderer::onWheel(QWheelEvent *event)
 {
+    // Select current context
+    ImGui::SetCurrentContext(g_ctx);
+
     // Handle horizontal component
     if(event->pixelDelta().x() != 0)
     {
@@ -360,6 +390,9 @@ void ImGuiRenderer::onWheel(QWheelEvent *event)
 
 void ImGuiRenderer::onKeyPressRelease(QKeyEvent *event)
 {
+    // Select current context
+    ImGui::SetCurrentContext(g_ctx);
+
     ImGuiIO& io = ImGui::GetIO();
     if (keyMap.contains(event->key())) {
         io.KeysDown[keyMap[event->key()]] = event->type() == QEvent::KeyPress;
