@@ -8,9 +8,3 @@ project(qtimgui_sln)
 add_subdirectory(examples)
 add_subdirectory(modules)
 add_subdirectory(src)
-
-# global
-# set(CMAKE_AUTOMOC ON)
-# set(CMAKE_AUTORCC ON)
-# set(CMAKE_AUTOUIC ON)
-# find_package(Qt5 COMPONENTS Core Quick Gui Widgets Svg REQUIRED)
