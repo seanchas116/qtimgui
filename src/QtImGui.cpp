@@ -5,6 +5,8 @@
 #include <QWidget>
 #endif
 
+#include <QDebug>
+
 namespace QtImGui {
 
 class QWindowWrapper : public WindowWrapper

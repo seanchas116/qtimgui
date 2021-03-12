@@ -420,22 +420,22 @@ void ImGuiRenderer::onKeyPressRelease(QKeyEvent *event)
 
 bool ImGuiRenderer::eventFilter(QObject *watched, QEvent *event)
 {
-    switch (event->type()) {
+  switch (event->type()) {
     case QEvent::MouseButtonPress:
     case QEvent::MouseButtonRelease:
-        this->onMousePressedChange(static_cast<QMouseEvent *>(event));
-        break;
+      this->onMousePressedChange(static_cast<QMouseEvent*>(event));
+      break;
     case QEvent::Wheel:
-        this->onWheel(static_cast<QWheelEvent *>(event));
-        break;
+      this->onWheel(static_cast<QWheelEvent*>(event));
+      break;
     case QEvent::KeyPress:
     case QEvent::KeyRelease:
-        this->onKeyPressRelease(static_cast<QKeyEvent *>(event));
-        break;
+      this->onKeyPressRelease(static_cast<QKeyEvent*>(event));
+      break;
     default:
-        break;
-    }
-    return QObject::eventFilter(watched, event);
+      break;
+  }
+  return QObject::eventFilter(watched, event);
 }
 
 ImGuiRenderer* ImGuiRenderer::instance() {
