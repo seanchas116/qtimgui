@@ -7,6 +7,6 @@ target_link_libraries(qt_imgui_demo_widget PRIVATE qt_imgui_widgets)
 target_link_libraries(qt_imgui_demo_widget PRIVATE implot)
 
 if(ANDROID)
-    include(${CMAKE_CURRENT_LIST_DIR}/../tools/qt-android-cmake/AddQtAndroidApk.cmake)
+    include(${CMAKE_CURRENT_LIST_DIR}/../../tools/qt-android-cmake/AddQtAndroidApk.cmake)
     add_qt_android_apk(qt_imgui_demo_widget_apk qt_imgui_demo_widget)
 endif()

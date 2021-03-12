@@ -1,3 +1,3 @@
 TEMPLATE = subdirs
 
-SUBDIRS += demo-widget demo-window
+SUBDIRS += examples/widget examples/window

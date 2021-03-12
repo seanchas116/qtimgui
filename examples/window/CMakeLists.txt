@@ -6,6 +6,6 @@ endif()
 target_link_libraries(qt_imgui_demo_window  PRIVATE qt_imgui_quick)
 
 if(ANDROID)
-    include(${CMAKE_CURRENT_LIST_DIR}/../tools/qt-android-cmake/AddQtAndroidApk.cmake)
+    include(${CMAKE_CURRENT_LIST_DIR}/../../tools/qt-android-cmake/AddQtAndroidApk.cmake)
     add_qt_android_apk(qt_imgui_demo_window_apk qt_imgui_demo_window)
 endif()

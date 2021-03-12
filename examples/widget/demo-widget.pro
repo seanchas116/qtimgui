@@ -2,7 +2,7 @@ QT       += core gui widgets
 TARGET = demo-widget
 TEMPLATE = app
 
-include(../qtimgui.pri)
+include(../../qtimgui.pri)
 
 SOURCES += \
     demo-widget.cpp
