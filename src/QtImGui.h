@@ -5,12 +5,14 @@ class QWindow;
 
 namespace QtImGui {
 
+typedef void* RenderRef;
+
 #ifdef QT_WIDGETS_LIB
-void initialize(QWidget *window);
+RenderRef initialize(QWidget *window, bool defaultRender = true);
 #endif
 
-void initialize(QWindow *window);
-void newFrame();
-void render();
+RenderRef initialize(QWindow *window, bool defaultRender = true);
+void newFrame(RenderRef ref = nullptr);
+void render(RenderRef ref = nullptr);
 
 }
