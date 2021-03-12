@@ -49,7 +49,9 @@ public:
     QPoint mapFromGlobal(const QPoint &p) const override {
         return w->mapFromGlobal(p);
     }
-
+    QObject* object() {
+      return w;
+    }
 private:
     QWidget *w;
 };
@@ -89,6 +91,9 @@ public:
     }
     QPoint mapFromGlobal(const QPoint &p) const override {
         return w->mapFromGlobal(p);
+    }
+    QObject* object() {
+      return w;
     }
 
 private:

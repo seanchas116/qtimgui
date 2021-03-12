@@ -20,6 +20,7 @@ public:
     virtual qreal devicePixelRatio() const = 0;
     virtual bool isActive() const = 0;
     virtual QPoint mapFromGlobal(const QPoint &p) const = 0;
+    virtual QObject* object() = 0;
 };
 
 class ImGuiRenderer : public QObject, QOpenGLExtraFunctions {

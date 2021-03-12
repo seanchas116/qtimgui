@@ -420,7 +420,8 @@ void ImGuiRenderer::onKeyPressRelease(QKeyEvent *event)
 
 bool ImGuiRenderer::eventFilter(QObject *watched, QEvent *event)
 {
-  switch (event->type()) {
+  if (watched == m_window->object()) {
+    switch (event->type()) {
     case QEvent::MouseButtonPress:
     case QEvent::MouseButtonRelease:
       this->onMousePressedChange(static_cast<QMouseEvent*>(event));
@@ -434,6 +435,7 @@ bool ImGuiRenderer::eventFilter(QObject *watched, QEvent *event)
       break;
     default:
       break;
+    }
   }
   return QObject::eventFilter(watched, event);
 }
