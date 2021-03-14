@@ -20,6 +20,7 @@ public:
     virtual qreal devicePixelRatio() const = 0;
     virtual bool isActive() const = 0;
     virtual QPoint mapFromGlobal(const QPoint &p) const = 0;
+    virtual QObject* object() = 0;
 };
 
 class ImGuiRenderer : public QObject, QOpenGLExtraFunctions {
@@ -32,9 +33,11 @@ public:
 
     static ImGuiRenderer *instance();
 
-private:
-    ImGuiRenderer() {}
+public:
+    ImGuiRenderer();
+    ~ImGuiRenderer();
 
+private:
     void onMousePressedChange(QMouseEvent *event);
     void onWheel(QWheelEvent *event);
     void onKeyPressRelease(QKeyEvent *event);
@@ -53,6 +56,8 @@ private:
     int          g_AttribLocationTex = 0, g_AttribLocationProjMtx = 0;
     int          g_AttribLocationPosition = 0, g_AttribLocationUV = 0, g_AttribLocationColor = 0;
     unsigned int g_VboHandle = 0, g_VaoHandle = 0, g_ElementsHandle = 0;
+
+    ImGuiContext* g_ctx = nullptr;
 };
 
 }

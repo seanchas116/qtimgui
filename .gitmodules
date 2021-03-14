@@ -1,9 +1,9 @@
 [submodule "imgui"]
-	path = imgui
+	path = modules/imgui
 	url = https://github.com/ocornut/imgui.git
 [submodule "tools/qt-android-cmake"]
 	path = tools/qt-android-cmake
 	url = https://github.com/LaurentGomila/qt-android-cmake.git
 [submodule "implot"]
-	path = implot
+	path = modules/implot
 	url = https://github.com/epezent/implot.git
