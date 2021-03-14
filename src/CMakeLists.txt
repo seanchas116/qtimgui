@@ -4,7 +4,7 @@ project(qtimgui)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
-find_package(Qt5 COMPONENTS Core Quick Gui Widgets Svg REQUIRED)
+find_package(Qt5 COMPONENTS Core Quick Gui Widgets REQUIRED)
 
 set(
     qt_imgui_sources
@@ -21,7 +21,7 @@ target_link_libraries(
     qt_imgui_quick
     PUBLIC
     imgui
-    Qt5::Core Qt5::Quick Qt5::Svg
+    Qt5::Gui
     )
 if (ANDROID)
     target_link_libraries(qt_imgui_quick PUBLIC log dl GLESv2 z)
@@ -34,7 +34,7 @@ target_link_libraries(
     qt_imgui_widgets
     PUBLIC
     imgui
-    Qt5::Core Qt5::Widgets Qt5::Svg
+    Qt5::Widgets
     )
 if (ANDROID)
     target_link_libraries(qt_imgui_widgets PUBLIC log dl GLESv2 z)
