@@ -39,7 +39,7 @@ protected:
 };
 ```
 
-See [QOpenGLWidget example](example/widget) and [QOpenGLWindow example](/example/window) for details.
+See [QOpenGLWidget example](examples/widget) and [QOpenGLWindow example](examples/window) for details.
 
 ## Specific notes for Android, when using cmake
 
