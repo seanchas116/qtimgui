@@ -21,7 +21,8 @@ namespace QtImGui {
 
 namespace {
 
-QHash<int, ImGuiKey> keyMap = {
+// Keyboard mapping. Dear ImGui use those indices to peek into the io.KeysDown[] array.
+const QHash<int, ImGuiKey> keyMap = {
     { Qt::Key_Tab, ImGuiKey_Tab },
     { Qt::Key_Left, ImGuiKey_LeftArrow },
     { Qt::Key_Right, ImGuiKey_RightArrow },
@@ -31,8 +32,10 @@ QHash<int, ImGuiKey> keyMap = {
     { Qt::Key_PageDown, ImGuiKey_PageDown },
     { Qt::Key_Home, ImGuiKey_Home },
     { Qt::Key_End, ImGuiKey_End },
+    { Qt::Key_Insert, ImGuiKey_Insert },
     { Qt::Key_Delete, ImGuiKey_Delete },
     { Qt::Key_Backspace, ImGuiKey_Backspace },
+    { Qt::Key_Space, ImGuiKey_Space },
     { Qt::Key_Enter, ImGuiKey_Enter },
     { Qt::Key_Return, ImGuiKey_Enter },
     { Qt::Key_Escape, ImGuiKey_Escape },
@@ -56,7 +59,11 @@ void ImGuiRenderer::initialize(WindowWrapper *window) {
     g_ctx = ImGui::CreateContext();
     ImGui::SetCurrentContext(g_ctx);
 
+    // Setup backend capabilities flags
     ImGuiIO &io = ImGui::GetIO();
+    io.BackendPlatformName = "qtimgui";
+    
+    // Setup keyboard mapping
     for (ImGuiKey key : keyMap.values()) {
         io.KeyMap[key] = key;
     }
