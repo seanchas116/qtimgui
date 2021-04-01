@@ -42,7 +42,7 @@ QHash<int, ImGuiKey> keyMap = {
     { Qt::Key_X, ImGuiKey_X },
     { Qt::Key_Y, ImGuiKey_Y },
     { Qt::Key_Z, ImGuiKey_Z },
-    { Qt::MiddleButton, ImGuiMouseButton_Middle }
+//    { Qt::MiddleButton, ImGuiMouseButton_Middle }
 };
 
 QByteArray g_currentClipboardText;
@@ -342,7 +342,8 @@ void ImGuiRenderer::render()
   ImGui::SetCurrentContext(g_ctx);
 
   auto drawData = ImGui::GetDrawData();
-  renderDrawList(drawData);
+  if(drawData)
+    renderDrawList(drawData);
 }
 
 ImGuiRenderer::ImGuiRenderer()
