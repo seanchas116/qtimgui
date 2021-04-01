@@ -1,18 +1,19 @@
 #include "QtImGui.h"
+
 #include "ImGuiRenderer.h"
 #include <QWindow>
 #ifdef QT_WIDGETS_LIB
 #include <QWidget>
 #endif
 
-#include <QDebug>
-
 namespace QtImGui {
 
 class QWindowWrapper : public WindowWrapper
 {
 public:
-  QWindowWrapper(ImGuiRenderer* r) :r(r) {}
+  QWindowWrapper(ImGuiRenderer* r) 
+    : r(r)
+  {}
   ~QWindowWrapper() {
     if (r && (r != ImGuiRenderer::instance())) {
       delete r;
@@ -33,7 +34,9 @@ namespace {
 
 class QWidgetWindowWrapper : public QWindowWrapper {
 public:
-    QWidgetWindowWrapper(QWidget *w, ImGuiRenderer* r) : w(w), QWindowWrapper(r) {}
+    QWidgetWindowWrapper(QWidget *w, ImGuiRenderer* r) 
+      : QWindowWrapper(r), w(w)
+    {}
     void installEventFilter(QObject *object) override {
         return w->installEventFilter(object);
     }
@@ -49,13 +52,14 @@ public:
     QPoint mapFromGlobal(const QPoint &p) const override {
         return w->mapFromGlobal(p);
     }
-    QObject* object() {
-      return w;
+    QObject* object() override {
+        return w;
     }
 private:
     QWidget *w;
 };
-}
+  
+} // namespace
 
 RenderRef initialize(QWidget *window, bool defaultRender) {
   if (defaultRender) {
@@ -70,13 +74,15 @@ RenderRef initialize(QWidget *window, bool defaultRender) {
   }
 }
 
-#endif
+#endif // QT_WIDGETS_LIB
 
 namespace {
 
 class QWindowWindowWrapper : public QWindowWrapper {
 public:
-    QWindowWindowWrapper(QWindow *w, ImGuiRenderer* r) : w(w), QWindowWrapper(r) {}
+    QWindowWindowWrapper(QWindow *w, ImGuiRenderer* r) 
+      : QWindowWrapper(r), w(w)
+    {}
     void installEventFilter(QObject *object) override {
         return w->installEventFilter(object);
     }
@@ -92,15 +98,15 @@ public:
     QPoint mapFromGlobal(const QPoint &p) const override {
         return w->mapFromGlobal(p);
     }
-    QObject* object() {
-      return w;
+    QObject* object() override {
+        return w;
     }
 
 private:
     QWindow *w;
 };
 
-}
+} // namespace
 
 RenderRef initialize(QWindow* window, bool defaultRender) {
   if (defaultRender) {
@@ -135,4 +141,4 @@ void render(RenderRef ref)
   }
 }
 
-}
+} // namespace QtImGui
