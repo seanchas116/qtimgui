@@ -35,6 +35,7 @@ protected:
         // more widgets...
 
         ImGui::Render();
+        QtImGui::render();
     }
 };
 ```
