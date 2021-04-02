@@ -419,26 +419,32 @@ void ImGuiRenderer::onKeyPressRelease(QKeyEvent *event)
     ImGui::SetCurrentContext(g_ctx);
 
     ImGuiIO& io = ImGui::GetIO();
-    if (keyMap.contains(event->key())) {
-        io.KeysDown[keyMap[event->key()]] = event->type() == QEvent::KeyPress;
+    
+    const bool key_pressed = (event->type() == QEvent::KeyPress);
+    
+    // Translate `Qt::Key` into `ImGuiKey`, and apply 'pressed' state for that key
+    const auto key_it = keyMap.constFind( event->key() );
+    if (key_it != keyMap.constEnd()) { // Qt's key found in keyMap
+        const int imgui_key = *(key_it);
+        io.KeysDown[imgui_key] = key_pressed;
     }
 
-    if (event->type() == QEvent::KeyPress) {
-        QString text = event->text();
+    if (key_pressed) {
+        const QString text = event->text();
         if (text.size() == 1) {
-            io.AddInputCharacter(text.at(0).unicode());
+            io.AddInputCharacter( text.at(0).unicode() );
         }
     }
 
 #ifdef Q_OS_MAC
-    io.KeyCtrl = event->modifiers() & Qt::MetaModifier;
+    io.KeyCtrl  = event->modifiers() & Qt::MetaModifier;
     io.KeyShift = event->modifiers() & Qt::ShiftModifier;
-    io.KeyAlt = event->modifiers() & Qt::AltModifier;
+    io.KeyAlt   = event->modifiers() & Qt::AltModifier;
     io.KeySuper = event->modifiers() & Qt::ControlModifier; // Comamnd key
 #else
-    io.KeyCtrl = event->modifiers() & Qt::ControlModifier;
+    io.KeyCtrl  = event->modifiers() & Qt::ControlModifier;
     io.KeyShift = event->modifiers() & Qt::ShiftModifier;
-    io.KeyAlt = event->modifiers() & Qt::AltModifier;
+    io.KeyAlt   = event->modifiers() & Qt::AltModifier;
     io.KeySuper = event->modifiers() & Qt::MetaModifier;
 #endif
 }
