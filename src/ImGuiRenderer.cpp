@@ -48,6 +48,20 @@ const QHash<int, ImGuiKey> keyMap = {
     { Qt::MiddleButton, ImGuiMouseButton_Middle }
 };
 
+#ifndef QT_NO_CURSOR
+const QHash<ImGuiMouseCursor, Qt::CursorShape> cursorMap = {
+    { ImGuiMouseCursor_Arrow,      Qt::CursorShape::ArrowCursor },
+    { ImGuiMouseCursor_TextInput,  Qt::CursorShape::IBeamCursor },
+    { ImGuiMouseCursor_ResizeAll,  Qt::CursorShape::SizeAllCursor },
+    { ImGuiMouseCursor_ResizeNS,   Qt::CursorShape::SizeVerCursor },
+    { ImGuiMouseCursor_ResizeEW,   Qt::CursorShape::SizeHorCursor },
+    { ImGuiMouseCursor_ResizeNESW, Qt::CursorShape::SizeBDiagCursor },
+    { ImGuiMouseCursor_ResizeNWSE, Qt::CursorShape::SizeFDiagCursor },
+    { ImGuiMouseCursor_Hand,       Qt::CursorShape::PointingHandCursor },
+    { ImGuiMouseCursor_NotAllowed, Qt::CursorShape::ForbiddenCursor },
+};
+#endif
+
 QByteArray g_currentClipboardText;
 
 }
@@ -61,6 +75,9 @@ void ImGuiRenderer::initialize(WindowWrapper *window) {
 
     // Setup backend capabilities flags
     ImGuiIO &io = ImGui::GetIO();
+    #ifndef QT_NO_CURSOR
+    io.BackendFlags |= ImGuiBackendFlags_HasMouseCursors; // We can honor GetMouseCursor() values (optional)
+    #endif
     io.BackendPlatformName = "qtimgui";
     
     // Setup keyboard mapping
@@ -336,8 +353,9 @@ void ImGuiRenderer::newFrame()
     g_MouseWheelH = 0;
     g_MouseWheel = 0;
 
-    // Hide OS mouse cursor if ImGui is drawing it
-    // glfwSetInputMode(g_Window, GLFW_CURSOR, io.MouseDrawCursor ? GLFW_CURSOR_HIDDEN : GLFW_CURSOR_NORMAL);
+    
+    updateCursorShape(io);
+    
 
     // Start the frame
     ImGui::NewFrame();
@@ -422,6 +440,39 @@ void ImGuiRenderer::onKeyPressRelease(QKeyEvent *event)
     io.KeyShift = event->modifiers() & Qt::ShiftModifier;
     io.KeyAlt = event->modifiers() & Qt::AltModifier;
     io.KeySuper = event->modifiers() & Qt::MetaModifier;
+#endif
+}
+
+void ImGuiRenderer::updateCursorShape(const ImGuiIO& io)
+{
+#ifndef QT_NO_CURSOR
+    if (io.ConfigFlags & ImGuiConfigFlags_NoMouseCursorChange)
+        return;
+
+    const ImGuiMouseCursor imgui_cursor = ImGui::GetMouseCursor();
+    if (io.MouseDrawCursor || (imgui_cursor == ImGuiMouseCursor_None))
+    {
+        // Hide OS mouse cursor if imgui is drawing it or if it wants no cursor
+        m_window->setCursorShape(Qt::CursorShape::BlankCursor);
+    }
+    else
+    {
+        // Show OS mouse cursor
+        
+        // Translate `ImGuiMouseCursor` into `Qt::CursorShape` and show it, if we can
+        const auto cursor_it = cursorMap.constFind( imgui_cursor );
+        if(cursor_it != cursorMap.constEnd()) // `Qt::CursorShape` found for `ImGuiMouseCursor`
+        {
+            const Qt::CursorShape qt_cursor_shape = *(cursor_it);
+            m_window->setCursorShape(qt_cursor_shape);
+        }
+        else // shape NOT found - use default
+        {
+            m_window->setCursorShape(Qt::CursorShape::ArrowCursor);
+        }
+    }
+#else
+    Q_UNUSED(io);
 #endif
 }
 

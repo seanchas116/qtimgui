@@ -55,6 +55,16 @@ public:
     QObject* object() override {
         return w;
     }
+    
+    void setCursorShape(Qt::CursorShape shape) override
+    {
+        #ifndef QT_NO_CURSOR
+            w->setCursor(shape);
+        #else
+            Q_UNUSED(shape);
+        #endif
+    }
+    
 private:
     QWidget *w;
 };
@@ -100,6 +110,15 @@ public:
     }
     QObject* object() override {
         return w;
+    }
+    
+    void setCursorShape(Qt::CursorShape shape) override
+    {
+        #ifndef QT_NO_CURSOR
+            w->setCursor(shape);
+        #else
+            Q_UNUSED(shape);
+        #endif
     }
 
 private:

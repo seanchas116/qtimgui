@@ -21,6 +21,8 @@ public:
     virtual bool isActive() const = 0;
     virtual QPoint mapFromGlobal(const QPoint &p) const = 0;
     virtual QObject* object() = 0;
+    
+    virtual void setCursorShape(Qt::CursorShape shape) = 0;
 };
 
 class ImGuiRenderer : public QObject, QOpenGLExtraFunctions {
@@ -41,6 +43,8 @@ private:
     void onMousePressedChange(QMouseEvent *event);
     void onWheel(QWheelEvent *event);
     void onKeyPressRelease(QKeyEvent *event);
+    
+    void updateCursorShape(const ImGuiIO &io);
 
     void renderDrawList(ImDrawData *draw_data);
     bool createFontsTexture();
