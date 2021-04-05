@@ -1,10 +1,10 @@
 #include "ImGuiRenderer.h"
+
 #include <QDateTime>
 #include <QGuiApplication>
 #include <QMouseEvent>
 #include <QClipboard>
 #include <QCursor>
-#include <QDebug>
 
 #ifdef ANDROID
 #define GL_VERTEX_ARRAY_BINDING           0x85B5 // Missing in android as of May 2020
@@ -64,7 +64,7 @@ const QHash<ImGuiMouseCursor, Qt::CursorShape> cursorMap = {
 
 QByteArray g_currentClipboardText;
 
-}
+} // namespace
 
 void ImGuiRenderer::initialize(WindowWrapper *window) {
     m_window.reset(window);
@@ -77,6 +77,7 @@ void ImGuiRenderer::initialize(WindowWrapper *window) {
     ImGuiIO &io = ImGui::GetIO();
     #ifndef QT_NO_CURSOR
     io.BackendFlags |= ImGuiBackendFlags_HasMouseCursors; // We can honor GetMouseCursor() values (optional)
+    io.BackendFlags |= ImGuiBackendFlags_HasSetMousePos;  // We can honor io.WantSetMousePos requests (optional, rarely used)
     #endif
     io.BackendPlatformName = "qtimgui";
     
@@ -107,7 +108,7 @@ void ImGuiRenderer::renderDrawList(ImDrawData *draw_data)
     ImGui::SetCurrentContext(g_ctx);
 
     // Avoid rendering when minimized, scale coordinates for retina displays (screen coordinates != framebuffer coordinates)
-    ImGuiIO& io = ImGui::GetIO();
+    const ImGuiIO& io = ImGui::GetIO();
     int fb_width = (int)(io.DisplaySize.x * io.DisplayFramebufferScale.x);
     int fb_height = (int)(io.DisplaySize.y * io.DisplayFramebufferScale.y);
     if (fb_width == 0 || fb_height == 0)
@@ -330,12 +331,17 @@ void ImGuiRenderer::newFrame()
     double current_time =  QDateTime::currentMSecsSinceEpoch() / double(1000);
     io.DeltaTime = g_Time > 0.0 ? (float)(current_time - g_Time) : (float)(1.0f/60.0f);
     g_Time = current_time;
+    
+    
+    // If ImGui wants to set cursor position (for example, during navigation by using keyboard)
+    // we need to do it here (before getting `QCursor::pos()` below).
+    setCursorPos(io);
 
     // Setup inputs
     // (we already got mouse wheel, keyboard keys & characters from glfw callbacks polled in glfwPollEvents())
     if (m_window->isActive())
     {
-        auto pos = m_window->mapFromGlobal(QCursor::pos());
+        const QPoint pos = m_window->mapFromGlobal(QCursor::pos());
         io.MousePos = ImVec2(pos.x(), pos.y());   // Mouse position in screen coordinates (set to -1,-1 if no mouse / on another screen, etc.)
     }
     else
@@ -451,6 +457,10 @@ void ImGuiRenderer::onKeyPressRelease(QKeyEvent *event)
 
 void ImGuiRenderer::updateCursorShape(const ImGuiIO& io)
 {
+    // NOTE: This code will be executed, only if the following flags have been set:
+    // - backend flag: `ImGuiBackendFlags_HasMouseCursors`    - enabled
+    // - config  flag: `ImGuiConfigFlags_NoMouseCursorChange` - disabled
+
 #ifndef QT_NO_CURSOR
     if (io.ConfigFlags & ImGuiConfigFlags_NoMouseCursorChange)
         return;
@@ -476,6 +486,21 @@ void ImGuiRenderer::updateCursorShape(const ImGuiIO& io)
         {
             m_window->setCursorShape(Qt::CursorShape::ArrowCursor);
         }
+    }
+#else
+    Q_UNUSED(io);
+#endif
+}
+
+void ImGuiRenderer::setCursorPos(const ImGuiIO& io)
+{
+    // NOTE: This code will be executed, only if the following flags have been set:
+    // - backend flag: `ImGuiBackendFlags_HasSetMousePos`      - enabled
+    // - config  flag: `ImGuiConfigFlags_NavEnableSetMousePos` - enabled
+    
+#ifndef QT_NO_CURSOR
+    if(io.WantSetMousePos) {
+        m_window->setCursorPos({(int)io.MousePos.x, (int)io.MousePos.y});
     }
 #else
     Q_UNUSED(io);
@@ -512,4 +537,4 @@ ImGuiRenderer* ImGuiRenderer::instance() {
     return instance;
 }
 
-}
+} // namespace QtImGui

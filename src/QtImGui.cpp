@@ -65,6 +65,20 @@ public:
         #endif
     }
     
+    void setCursorPos(const QPoint& local_pos) override
+    {
+        #ifndef QT_NO_CURSOR
+            // Convert position from widget-space into screen-space
+            const QPoint global_pos = w->mapToGlobal(local_pos);
+
+            QCursor cursor = w->cursor();
+            cursor.setPos(global_pos);
+            w->setCursor(cursor);
+        #else
+            Q_UNUSED(local_pos);
+        #endif
+    }
+    
 private:
     QWidget *w;
 };
@@ -118,6 +132,20 @@ public:
             w->setCursor(shape);
         #else
             Q_UNUSED(shape);
+        #endif
+    }
+    
+    void setCursorPos(const QPoint& local_pos) override
+    {
+        #ifndef QT_NO_CURSOR
+            // Convert position from window-space into screen-space
+            const QPoint global_pos = w->mapToGlobal(local_pos);
+
+            QCursor cursor = w->cursor();
+            cursor.setPos(global_pos);
+            w->setCursor(cursor);
+        #else
+            Q_UNUSED(local_pos);
         #endif
     }
 
