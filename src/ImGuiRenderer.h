@@ -23,6 +23,7 @@ public:
     virtual QObject* object() = 0;
     
     virtual void setCursorShape(Qt::CursorShape shape) = 0;
+    virtual void setCursorPos(const QPoint& local_pos) = 0;
 };
 
 class ImGuiRenderer : public QObject, QOpenGLExtraFunctions {
@@ -45,6 +46,7 @@ private:
     void onKeyPressRelease(QKeyEvent *event);
     
     void updateCursorShape(const ImGuiIO &io);
+    void setCursorPos(const ImGuiIO &io);
 
     void renderDrawList(ImDrawData *draw_data);
     bool createFontsTexture();
@@ -64,4 +66,4 @@ private:
     ImGuiContext* g_ctx = nullptr;
 };
 
-}
+} // namespace QtImGui
