@@ -4,6 +4,7 @@
 #ifdef QT_WIDGETS_LIB
 #include <QWidget>
 #endif
+#include <QScreen>
 
 #include <QDebug>
 
@@ -52,6 +53,12 @@ public:
     QObject* object() {
       return w;
     }
+    void physicalDpi(float* ddpi, float* hdpi, float* vdpi)
+    {
+        *hdpi = w->physicalDpiX();
+        *vdpi = w->physicalDpiY();
+        *ddpi = std::max(*hdpi, *vdpi);
+    }
 private:
     QWidget *w;
 };
@@ -95,6 +102,12 @@ public:
     QObject* object() {
       return w;
     }
+    void physicalDpi(float* ddpi, float* hdpi, float* vdpi)
+    {
+        *hdpi = w->screen()->physicalDotsPerInchX();
+        *vdpi = w->screen()->physicalDotsPerInchY();
+        *ddpi = std::max(*hdpi, *vdpi);
+    }
 
 private:
     QWindow *w;
@@ -133,6 +146,26 @@ void render(RenderRef ref)
     auto wrapper = reinterpret_cast<QWindowWrapper*>(ref);
     wrapper->render();
   }
+}
+
+double devicePixelRatio(RenderRef ref)
+{
+    if (!ref) {
+      return ImGuiRenderer::instance()->devicePixelRatio();
+    } else {
+      auto wrapper = reinterpret_cast<QWindowWrapper*>(ref);
+      return wrapper->devicePixelRatio();
+    }
+}
+
+void physicalDpi(float* ddpi, float* hdpi, float* vdpi, RenderRef ref)
+{
+    if (!ref) {
+      ImGuiRenderer::instance()->physicalDpi(ddpi, hdpi, vdpi);
+    } else {
+      auto wrapper = reinterpret_cast<QWindowWrapper*>(ref);
+      wrapper->physicalDpi(ddpi, hdpi, vdpi);
+    }
 }
 
 }

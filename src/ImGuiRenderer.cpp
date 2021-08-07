@@ -449,4 +449,14 @@ ImGuiRenderer* ImGuiRenderer::instance() {
     return instance;
 }
 
+double ImGuiRenderer::devicePixelRatio()
+{
+    return m_window->devicePixelRatio();
+}
+
+void ImGuiRenderer::physicalDpi(float* ddpi, float* hdpi, float* vdpi)
+{
+    m_window->physicalDpi(ddpi, hdpi, vdpi);
+}
+
 }

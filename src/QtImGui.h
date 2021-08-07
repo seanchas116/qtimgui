@@ -14,5 +14,6 @@ RenderRef initialize(QWidget *window, bool defaultRender = true);
 RenderRef initialize(QWindow *window, bool defaultRender = true);
 void newFrame(RenderRef ref = nullptr);
 void render(RenderRef ref = nullptr);
-
+double devicePixelRatio(RenderRef ref = nullptr);
+void physicalDpi(float* ddpi, float* hdpi, float* vdpi, RenderRef ref = nullptr);
 }

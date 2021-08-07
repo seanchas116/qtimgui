@@ -21,6 +21,8 @@ public:
     virtual bool isActive() const = 0;
     virtual QPoint mapFromGlobal(const QPoint &p) const = 0;
     virtual QObject* object() = 0;
+    virtual void physicalDpi(float* ddpi, float* hdpi, float* vdpi) = 0;
+
 };
 
 class ImGuiRenderer : public QObject, QOpenGLExtraFunctions {
@@ -30,6 +32,8 @@ public:
     void newFrame();
     void render();
     bool eventFilter(QObject *watched, QEvent *event);
+    double devicePixelRatio();
+    void physicalDpi(float* ddpi, float* hdpi, float* vdpi);
 
     static ImGuiRenderer *instance();
 
