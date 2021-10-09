@@ -50,7 +50,7 @@ QByteArray g_currentClipboardText;
 }
 
 void ImGuiRenderer::initialize(WindowWrapper *window) {
-    m_window.reset(window);
+    m_window = window;
     initializeOpenGLFunctions();
 
     g_ctx = ImGui::CreateContext();
@@ -75,6 +75,10 @@ void ImGuiRenderer::initialize(WindowWrapper *window) {
     };
 
     window->installEventFilter(this);
+}
+
+void ImGuiRenderer::destroy(WindowWrapper *window) {
+    window->removeEventFilter(this);
 }
 
 void ImGuiRenderer::renderDrawList(ImDrawData *draw_data)

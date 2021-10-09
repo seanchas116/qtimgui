@@ -24,7 +24,6 @@ public:
   void newFrame() { r->newFrame(); }
 
   void render() { r->render(); }
-private:
   ImGuiRenderer* r;
 };
 
@@ -35,8 +34,11 @@ namespace {
 class QWidgetWindowWrapper : public QWindowWrapper {
 public:
     QWidgetWindowWrapper(QWidget *w, ImGuiRenderer* r) : w(w), QWindowWrapper(r) {}
-    void installEventFilter(QObject *object) override {
-        return w->installEventFilter(object);
+    virtual void installEventFilter(QObject *object) override {
+        w->installEventFilter(object);
+    }
+    virtual void removeEventFilter(QObject *object) override {
+        w->removeEventFilter(object);
     }
     QSize size() const override {
         return w->size();
@@ -84,8 +86,11 @@ namespace {
 class QWindowWindowWrapper : public QWindowWrapper {
 public:
     QWindowWindowWrapper(QWindow *w, ImGuiRenderer* r) : w(w), QWindowWrapper(r) {}
-    void installEventFilter(QObject *object) override {
-        return w->installEventFilter(object);
+    virtual void installEventFilter(QObject *object) override {
+        w->installEventFilter(object);
+    }
+    virtual void removeEventFilter(QObject *object) override {
+        w->installEventFilter(object);
     }
     QSize size() const override {
         return w->size();
@@ -127,6 +132,19 @@ RenderRef initialize(QWindow* window, bool defaultRender) {
     render->initialize(wrapper);
     return reinterpret_cast<RenderRef>(dynamic_cast<QWindowWrapper*>(wrapper));
   }
+}
+
+void destroy(RenderRef ref)
+{
+    if(!ref) {
+        // TODO
+    }
+    else {
+        auto* wrapper = reinterpret_cast<QWindowWindowWrapper*>(ref);
+        auto* render  = wrapper->r;
+        render->destroy(wrapper);
+        delete wrapper;
+    }
 }
 
 void newFrame(RenderRef ref) {

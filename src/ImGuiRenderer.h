@@ -16,6 +16,7 @@ class WindowWrapper {
 public:
     virtual ~WindowWrapper() {}
     virtual void installEventFilter(QObject *object) = 0;
+    virtual void removeEventFilter(QObject *object) = 0;
     virtual QSize size() const = 0;
     virtual qreal devicePixelRatio() const = 0;
     virtual bool isActive() const = 0;
@@ -29,6 +30,7 @@ class ImGuiRenderer : public QObject, QOpenGLExtraFunctions {
     Q_OBJECT
 public:
     void initialize(WindowWrapper *window);
+    void destroy(WindowWrapper *window);
     void newFrame();
     void render();
     bool eventFilter(QObject *watched, QEvent *event);
@@ -50,7 +52,7 @@ private:
     bool createFontsTexture();
     bool createDeviceObjects();
 
-    std::unique_ptr<WindowWrapper> m_window;
+    WindowWrapper* m_window;
     double       g_Time = 0.0f;
     bool         g_MousePressed[3] = { false, false, false };
     float        g_MouseWheel;
