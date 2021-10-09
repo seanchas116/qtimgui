@@ -1,10 +1,10 @@
 #include "ImGuiRenderer.h"
+
 #include <QDateTime>
 #include <QGuiApplication>
 #include <QMouseEvent>
 #include <QClipboard>
 #include <QCursor>
-#include <QDebug>
 
 #ifdef ANDROID
 #define GL_VERTEX_ARRAY_BINDING           0x85B5 // Missing in android as of May 2020
@@ -21,7 +21,8 @@ namespace QtImGui {
 
 namespace {
 
-QHash<int, ImGuiKey> keyMap = {
+// Keyboard mapping. Dear ImGui use those indices to peek into the io.KeysDown[] array.
+const QHash<int, ImGuiKey> keyMap = {
     { Qt::Key_Tab, ImGuiKey_Tab },
     { Qt::Key_Left, ImGuiKey_LeftArrow },
     { Qt::Key_Right, ImGuiKey_RightArrow },
@@ -31,8 +32,10 @@ QHash<int, ImGuiKey> keyMap = {
     { Qt::Key_PageDown, ImGuiKey_PageDown },
     { Qt::Key_Home, ImGuiKey_Home },
     { Qt::Key_End, ImGuiKey_End },
+    { Qt::Key_Insert, ImGuiKey_Insert },
     { Qt::Key_Delete, ImGuiKey_Delete },
     { Qt::Key_Backspace, ImGuiKey_Backspace },
+    { Qt::Key_Space, ImGuiKey_Space },
     { Qt::Key_Enter, ImGuiKey_Enter },
     { Qt::Key_Return, ImGuiKey_Enter },
     { Qt::Key_Escape, ImGuiKey_Escape },
@@ -45,9 +48,23 @@ QHash<int, ImGuiKey> keyMap = {
     { Qt::MiddleButton, ImGuiMouseButton_Middle }
 };
 
+#ifndef QT_NO_CURSOR
+const QHash<ImGuiMouseCursor, Qt::CursorShape> cursorMap = {
+    { ImGuiMouseCursor_Arrow,      Qt::CursorShape::ArrowCursor },
+    { ImGuiMouseCursor_TextInput,  Qt::CursorShape::IBeamCursor },
+    { ImGuiMouseCursor_ResizeAll,  Qt::CursorShape::SizeAllCursor },
+    { ImGuiMouseCursor_ResizeNS,   Qt::CursorShape::SizeVerCursor },
+    { ImGuiMouseCursor_ResizeEW,   Qt::CursorShape::SizeHorCursor },
+    { ImGuiMouseCursor_ResizeNESW, Qt::CursorShape::SizeBDiagCursor },
+    { ImGuiMouseCursor_ResizeNWSE, Qt::CursorShape::SizeFDiagCursor },
+    { ImGuiMouseCursor_Hand,       Qt::CursorShape::PointingHandCursor },
+    { ImGuiMouseCursor_NotAllowed, Qt::CursorShape::ForbiddenCursor },
+};
+#endif
+
 QByteArray g_currentClipboardText;
 
-}
+} // namespace
 
 void ImGuiRenderer::initialize(WindowWrapper *window) {
     m_window = window;
@@ -56,7 +73,15 @@ void ImGuiRenderer::initialize(WindowWrapper *window) {
     g_ctx = ImGui::CreateContext();
     ImGui::SetCurrentContext(g_ctx);
 
+    // Setup backend capabilities flags
     ImGuiIO &io = ImGui::GetIO();
+    #ifndef QT_NO_CURSOR
+    io.BackendFlags |= ImGuiBackendFlags_HasMouseCursors; // We can honor GetMouseCursor() values (optional)
+    io.BackendFlags |= ImGuiBackendFlags_HasSetMousePos;  // We can honor io.WantSetMousePos requests (optional, rarely used)
+    #endif
+    io.BackendPlatformName = "qtimgui";
+    
+    // Setup keyboard mapping
     for (ImGuiKey key : keyMap.values()) {
         io.KeyMap[key] = key;
     }
@@ -87,7 +112,7 @@ void ImGuiRenderer::renderDrawList(ImDrawData *draw_data)
     ImGui::SetCurrentContext(g_ctx);
 
     // Avoid rendering when minimized, scale coordinates for retina displays (screen coordinates != framebuffer coordinates)
-    ImGuiIO& io = ImGui::GetIO();
+    const ImGuiIO& io = ImGui::GetIO();
     int fb_width = (int)(io.DisplaySize.x * io.DisplayFramebufferScale.x);
     int fb_height = (int)(io.DisplaySize.y * io.DisplayFramebufferScale.y);
     if (fb_width == 0 || fb_height == 0)
@@ -310,12 +335,17 @@ void ImGuiRenderer::newFrame()
     double current_time =  QDateTime::currentMSecsSinceEpoch() / double(1000);
     io.DeltaTime = g_Time > 0.0 ? (float)(current_time - g_Time) : (float)(1.0f/60.0f);
     g_Time = current_time;
+    
+    
+    // If ImGui wants to set cursor position (for example, during navigation by using keyboard)
+    // we need to do it here (before getting `QCursor::pos()` below).
+    setCursorPos(io);
 
     // Setup inputs
     // (we already got mouse wheel, keyboard keys & characters from glfw callbacks polled in glfwPollEvents())
     if (m_window->isActive())
     {
-        auto pos = m_window->mapFromGlobal(QCursor::pos());
+        const QPoint pos = m_window->mapFromGlobal(QCursor::pos());
         io.MousePos = ImVec2(pos.x(), pos.y());   // Mouse position in screen coordinates (set to -1,-1 if no mouse / on another screen, etc.)
     }
     else
@@ -333,8 +363,9 @@ void ImGuiRenderer::newFrame()
     g_MouseWheelH = 0;
     g_MouseWheel = 0;
 
-    // Hide OS mouse cursor if ImGui is drawing it
-    // glfwSetInputMode(g_Window, GLFW_CURSOR, io.MouseDrawCursor ? GLFW_CURSOR_HIDDEN : GLFW_CURSOR_NORMAL);
+    
+    updateCursorShape(io);
+    
 
     // Start the frame
     ImGui::NewFrame();
@@ -399,27 +430,85 @@ void ImGuiRenderer::onKeyPressRelease(QKeyEvent *event)
     ImGui::SetCurrentContext(g_ctx);
 
     ImGuiIO& io = ImGui::GetIO();
-    if (keyMap.contains(event->key())) {
-        io.KeysDown[keyMap[event->key()]] = event->type() == QEvent::KeyPress;
+    
+    const bool key_pressed = (event->type() == QEvent::KeyPress);
+    
+    // Translate `Qt::Key` into `ImGuiKey`, and apply 'pressed' state for that key
+    const auto key_it = keyMap.constFind( event->key() );
+    if (key_it != keyMap.constEnd()) { // Qt's key found in keyMap
+        const int imgui_key = *(key_it);
+        io.KeysDown[imgui_key] = key_pressed;
     }
 
-    if (event->type() == QEvent::KeyPress) {
-        QString text = event->text();
+    if (key_pressed) {
+        const QString text = event->text();
         if (text.size() == 1) {
-            io.AddInputCharacter(text.at(0).unicode());
+            io.AddInputCharacter( text.at(0).unicode() );
         }
     }
 
 #ifdef Q_OS_MAC
-    io.KeyCtrl = event->modifiers() & Qt::MetaModifier;
+    io.KeyCtrl  = event->modifiers() & Qt::MetaModifier;
     io.KeyShift = event->modifiers() & Qt::ShiftModifier;
-    io.KeyAlt = event->modifiers() & Qt::AltModifier;
+    io.KeyAlt   = event->modifiers() & Qt::AltModifier;
     io.KeySuper = event->modifiers() & Qt::ControlModifier; // Comamnd key
 #else
-    io.KeyCtrl = event->modifiers() & Qt::ControlModifier;
+    io.KeyCtrl  = event->modifiers() & Qt::ControlModifier;
     io.KeyShift = event->modifiers() & Qt::ShiftModifier;
-    io.KeyAlt = event->modifiers() & Qt::AltModifier;
+    io.KeyAlt   = event->modifiers() & Qt::AltModifier;
     io.KeySuper = event->modifiers() & Qt::MetaModifier;
+#endif
+}
+
+void ImGuiRenderer::updateCursorShape(const ImGuiIO& io)
+{
+    // NOTE: This code will be executed, only if the following flags have been set:
+    // - backend flag: `ImGuiBackendFlags_HasMouseCursors`    - enabled
+    // - config  flag: `ImGuiConfigFlags_NoMouseCursorChange` - disabled
+
+#ifndef QT_NO_CURSOR
+    if (io.ConfigFlags & ImGuiConfigFlags_NoMouseCursorChange)
+        return;
+
+    const ImGuiMouseCursor imgui_cursor = ImGui::GetMouseCursor();
+    if (io.MouseDrawCursor || (imgui_cursor == ImGuiMouseCursor_None))
+    {
+        // Hide OS mouse cursor if imgui is drawing it or if it wants no cursor
+        m_window->setCursorShape(Qt::CursorShape::BlankCursor);
+    }
+    else
+    {
+        // Show OS mouse cursor
+        
+        // Translate `ImGuiMouseCursor` into `Qt::CursorShape` and show it, if we can
+        const auto cursor_it = cursorMap.constFind( imgui_cursor );
+        if(cursor_it != cursorMap.constEnd()) // `Qt::CursorShape` found for `ImGuiMouseCursor`
+        {
+            const Qt::CursorShape qt_cursor_shape = *(cursor_it);
+            m_window->setCursorShape(qt_cursor_shape);
+        }
+        else // shape NOT found - use default
+        {
+            m_window->setCursorShape(Qt::CursorShape::ArrowCursor);
+        }
+    }
+#else
+    Q_UNUSED(io);
+#endif
+}
+
+void ImGuiRenderer::setCursorPos(const ImGuiIO& io)
+{
+    // NOTE: This code will be executed, only if the following flags have been set:
+    // - backend flag: `ImGuiBackendFlags_HasSetMousePos`      - enabled
+    // - config  flag: `ImGuiConfigFlags_NavEnableSetMousePos` - enabled
+    
+#ifndef QT_NO_CURSOR
+    if(io.WantSetMousePos) {
+        m_window->setCursorPos({(int)io.MousePos.x, (int)io.MousePos.y});
+    }
+#else
+    Q_UNUSED(io);
 #endif
 }
 
@@ -463,4 +552,4 @@ void ImGuiRenderer::physicalDpi(float* ddpi, float* hdpi, float* vdpi)
     m_window->physicalDpi(ddpi, hdpi, vdpi);
 }
 
-}
+} // namespace QtImGui
