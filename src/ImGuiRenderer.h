@@ -22,7 +22,8 @@ public:
     virtual QPoint mapFromGlobal(const QPoint &p) const = 0;
     virtual QObject* object() = 0;
     virtual void physicalDpi(float* ddpi, float* hdpi, float* vdpi) = 0;
-
+    virtual void setCursorShape(Qt::CursorShape shape) = 0;
+    virtual void setCursorPos(const QPoint& local_pos) = 0;
 };
 
 class ImGuiRenderer : public QObject, QOpenGLExtraFunctions {
@@ -45,6 +46,9 @@ private:
     void onMousePressedChange(QMouseEvent *event);
     void onWheel(QWheelEvent *event);
     void onKeyPressRelease(QKeyEvent *event);
+    
+    void updateCursorShape(const ImGuiIO &io);
+    void setCursorPos(const ImGuiIO &io);
 
     void renderDrawList(ImDrawData *draw_data);
     bool createFontsTexture();
@@ -64,4 +68,4 @@ private:
     ImGuiContext* g_ctx = nullptr;
 };
 
-}
+} // namespace QtImGui

@@ -1,4 +1,5 @@
 #include "QtImGui.h"
+
 #include "ImGuiRenderer.h"
 #include <QWindow>
 #ifdef QT_WIDGETS_LIB
@@ -6,14 +7,14 @@
 #endif
 #include <QScreen>
 
-#include <QDebug>
-
 namespace QtImGui {
 
 class QWindowWrapper : public WindowWrapper
 {
 public:
-  QWindowWrapper(ImGuiRenderer* r) :r(r) {}
+  QWindowWrapper(ImGuiRenderer* r) 
+    : r(r)
+  {}
   ~QWindowWrapper() {
     if (r && (r != ImGuiRenderer::instance())) {
       delete r;
@@ -34,7 +35,9 @@ namespace {
 
 class QWidgetWindowWrapper : public QWindowWrapper {
 public:
-    QWidgetWindowWrapper(QWidget *w, ImGuiRenderer* r) : w(w), QWindowWrapper(r) {}
+    QWidgetWindowWrapper(QWidget *w, ImGuiRenderer* r) 
+      : QWindowWrapper(r), w(w)
+    {}
     void installEventFilter(QObject *object) override {
         return w->installEventFilter(object);
     }
@@ -50,19 +53,45 @@ public:
     QPoint mapFromGlobal(const QPoint &p) const override {
         return w->mapFromGlobal(p);
     }
-    QObject* object() {
-      return w;
+    QObject* object() override {
+        return w;
     }
+    
+    void setCursorShape(Qt::CursorShape shape) override
+    {
+        #ifndef QT_NO_CURSOR
+            w->setCursor(shape);
+        #else
+            Q_UNUSED(shape);
+        #endif
+    }
+
     void physicalDpi(float* ddpi, float* hdpi, float* vdpi)
     {
         *hdpi = w->physicalDpiX();
         *vdpi = w->physicalDpiY();
         *ddpi = std::max(*hdpi, *vdpi);
     }
+    
+    void setCursorPos(const QPoint& local_pos) override
+    {
+        #ifndef QT_NO_CURSOR
+            // Convert position from widget-space into screen-space
+            const QPoint global_pos = w->mapToGlobal(local_pos);
+
+            QCursor cursor = w->cursor();
+            cursor.setPos(global_pos);
+            w->setCursor(cursor);
+        #else
+            Q_UNUSED(local_pos);
+        #endif
+    }
+
 private:
     QWidget *w;
 };
-}
+  
+} // namespace
 
 RenderRef initialize(QWidget *window, bool defaultRender) {
   if (defaultRender) {
@@ -77,13 +106,15 @@ RenderRef initialize(QWidget *window, bool defaultRender) {
   }
 }
 
-#endif
+#endif // QT_WIDGETS_LIB
 
 namespace {
 
 class QWindowWindowWrapper : public QWindowWrapper {
 public:
-    QWindowWindowWrapper(QWindow *w, ImGuiRenderer* r) : w(w), QWindowWrapper(r) {}
+    QWindowWindowWrapper(QWindow *w, ImGuiRenderer* r) 
+      : QWindowWrapper(r), w(w)
+    {}
     void installEventFilter(QObject *object) override {
         return w->installEventFilter(object);
     }
@@ -99,8 +130,31 @@ public:
     QPoint mapFromGlobal(const QPoint &p) const override {
         return w->mapFromGlobal(p);
     }
-    QObject* object() {
-      return w;
+    QObject* object() override {
+        return w;
+    }
+    
+    void setCursorShape(Qt::CursorShape shape) override
+    {
+        #ifndef QT_NO_CURSOR
+            w->setCursor(shape);
+        #else
+            Q_UNUSED(shape);
+        #endif
+    }
+    
+    void setCursorPos(const QPoint& local_pos) override
+    {
+        #ifndef QT_NO_CURSOR
+            // Convert position from window-space into screen-space
+            const QPoint global_pos = w->mapToGlobal(local_pos);
+
+            QCursor cursor = w->cursor();
+            cursor.setPos(global_pos);
+            w->setCursor(cursor);
+        #else
+            Q_UNUSED(local_pos);
+        #endif
     }
     void physicalDpi(float* ddpi, float* hdpi, float* vdpi)
     {
@@ -113,7 +167,7 @@ private:
     QWindow *w;
 };
 
-}
+} // namespace
 
 RenderRef initialize(QWindow* window, bool defaultRender) {
   if (defaultRender) {
@@ -168,4 +222,5 @@ void physicalDpi(float* ddpi, float* hdpi, float* vdpi, RenderRef ref)
     }
 }
 
-}
+} // namespace QtImGui
+
