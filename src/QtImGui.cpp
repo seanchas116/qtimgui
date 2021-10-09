@@ -112,20 +112,12 @@ namespace {
 
 class QWindowWindowWrapper : public QWindowWrapper {
 public:
-<<<<<<< HEAD
     QWindowWindowWrapper(QWindow *w, ImGuiRenderer* r) : w(w), QWindowWrapper(r) {}
     virtual void installEventFilter(QObject *object) override {
         w->installEventFilter(object);
     }
     virtual void removeEventFilter(QObject *object) override {
         w->installEventFilter(object);
-=======
-    QWindowWindowWrapper(QWindow *w, ImGuiRenderer* r) 
-      : QWindowWrapper(r), w(w)
-    {}
-    void installEventFilter(QObject *object) override {
-        return w->installEventFilter(object);
->>>>>>> 0a65a0fa8c82c292d7c544bd9c65a2084ac2807f
     }
     QSize size() const override {
         return w->size();
