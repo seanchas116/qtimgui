@@ -511,6 +511,7 @@ bool ImGuiRenderer::eventFilter(QObject *watched, QEvent *event)
 {
   if (watched == m_window->object()) {
     switch (event->type()) {
+    case QEvent::MouseButtonDblClick:
     case QEvent::MouseButtonPress:
     case QEvent::MouseButtonRelease:
       this->onMousePressedChange(static_cast<QMouseEvent*>(event));
