@@ -1,3 +1,4 @@
+#include <QGridLayout>
 #include <QtImGui.h>
 #include <imgui.h>
 #include <QApplication>
@@ -7,17 +8,26 @@
 #include <QOpenGLExtraFunctions>
 #include <implot.h>
 
-class DemoWindow : public QOpenGLWidget, private QOpenGLExtraFunctions
+class DemoWidget : public QOpenGLWidget, private QOpenGLExtraFunctions
 {
+
 protected:
     void initializeGL() override
     {
         initializeOpenGLFunctions();
-        QtImGui::initialize(this);
+        ref = QtImGui::initialize(this,false);
+        // Update at 60 fps
+        QObject::connect(&timer, SIGNAL(timeout()), this, SLOT(update()));
+        timer.start(16);
+        im_context = ImPlot::CreateContext();
     }
+
+
     void paintGL() override
     {
-        QtImGui::newFrame();
+        QtImGui::newFrame(ref);
+        //ImGui::GetIO().BackendFlags = ImGui::GetIO().BackendFlags | ImGuiBackendFlags_RendererHasVtxOffset;
+        //auto test =(ImGui::GetIO().BackendFlags & ImGuiBackendFlags_RendererHasVtxOffset);
 
         // 1. Show a simple window
         // Tip: if we don't call ImGui::Begin()/ImGui::End() the widgets appears in a window automatically called "Debug"
@@ -42,9 +52,8 @@ protected:
         if (show_implot_demo_window)
         {
             ImGui::SetNextWindowPos(ImVec2(650, 20), ImGuiCond_FirstUseEver);
-            ImPlot::CreateContext();
+            ImPlot::SetCurrentContext(im_context);
             ImPlot::ShowDemoWindow(&show_implot_demo_window);
-            ImPlot::DestroyContext();
         }
 
         // Do render before ImGui UI is rendered
@@ -53,13 +62,17 @@ protected:
         glClear(GL_COLOR_BUFFER_BIT);
 
         ImGui::Render();
-        QtImGui::render();
+        QtImGui::render(ref);
     }
 
 private:
     bool show_imgui_demo_window = true;
     bool show_implot_demo_window = false;
     ImVec4 clear_color = ImColor(114, 144, 154);
+    ImPlotContext * im_context;
+    QtImGui::RenderRef ref         = nullptr;
+    QTimer  timer{this};
+
 };
 
 int main(int argc, char *argv[])
@@ -68,22 +81,24 @@ int main(int argc, char *argv[])
 
     // Use OpenGL 3 Core Profile, when available
     QSurfaceFormat glFormat;
-    if (QOpenGLContext::openGLModuleType() == QOpenGLContext::LibGL)
-    {
+    if (QOpenGLContext::openGLModuleType() == QOpenGLContext::LibGL) {
         glFormat.setVersion(3, 3);
         glFormat.setProfile(QSurfaceFormat::CoreProfile);
     }
     QSurfaceFormat::setDefaultFormat(glFormat);
 
     // Show window
-    DemoWindow w;
-    w.setWindowTitle("QtImGui widget example");
-    w.resize(1280, 720);
-    w.show();
-
+    DemoWidget *widget=new DemoWidget();
+    widget->setWindowTitle("QtImGui widget example");
+    QWidget* window=new QWidget();
+    auto* l = new QGridLayout();
+    window->setLayout(l);
+    l->addWidget(widget, 0, 0);
+    window->resize(1280, 720);
+    window->show();
     // Update at 60 fps
     QTimer timer;
-    QObject::connect(&timer, SIGNAL(timeout()), &w, SLOT(update()));
+    QObject::connect(&timer, SIGNAL(timeout()), widget, SLOT(update()));
     timer.start(16);
 
     return a.exec();
