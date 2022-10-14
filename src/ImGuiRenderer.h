@@ -4,6 +4,15 @@
 #include <QObject>
 #include <QPoint>
 #include <imgui.h>
+
+#ifdef IMGUI_VERSION_NUM
+    #if IMGUI_VERSION_NUM < 18700
+       #error only ImGUI v1.87 or higer is supported see https://github.com/ocornut/imgui/releases/tag/v1.87
+    #endif
+#else
+    #error Unknow version of ImGUI
+#endif
+
 #include <memory>
 
 class QMouseEvent;

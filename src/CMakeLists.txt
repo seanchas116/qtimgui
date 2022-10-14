@@ -19,9 +19,8 @@ message(STATUS  Qt ${QT_DEFAULT_MAJOR_VERSION})
 
 set(
     qt_imgui_sources
-    ImGuiRenderer.h
+    key_mappings.h
     ImGuiRenderer.cpp
-    QtImGui.h
     QtImGui.cpp
 )
 

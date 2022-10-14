@@ -1,5 +1,5 @@
 #include "ImGuiRenderer.h"
-
+#include "key_mappings.h"
 #include <QDateTime>
 #include <QGuiApplication>
 #include <QMouseEvent>
@@ -21,32 +21,6 @@ namespace QtImGui {
 
 namespace {
 
-// Keyboard mapping. Dear ImGui use those indices to peek into the io.KeysDown[] array.
-const QHash<int, ImGuiKey> keyMap = {
-    { Qt::Key_Tab, ImGuiKey_Tab },
-    { Qt::Key_Left, ImGuiKey_LeftArrow },
-    { Qt::Key_Right, ImGuiKey_RightArrow },
-    { Qt::Key_Up, ImGuiKey_UpArrow },
-    { Qt::Key_Down, ImGuiKey_DownArrow },
-    { Qt::Key_PageUp, ImGuiKey_PageUp },
-    { Qt::Key_PageDown, ImGuiKey_PageDown },
-    { Qt::Key_Home, ImGuiKey_Home },
-    { Qt::Key_End, ImGuiKey_End },
-    { Qt::Key_Insert, ImGuiKey_Insert },
-    { Qt::Key_Delete, ImGuiKey_Delete },
-    { Qt::Key_Backspace, ImGuiKey_Backspace },
-    { Qt::Key_Space, ImGuiKey_Space },
-    { Qt::Key_Enter, ImGuiKey_Enter },
-    { Qt::Key_Return, ImGuiKey_Enter },
-    { Qt::Key_Escape, ImGuiKey_Escape },
-    { Qt::Key_A, ImGuiKey_A },
-    { Qt::Key_C, ImGuiKey_C },
-    { Qt::Key_V, ImGuiKey_V },
-    { Qt::Key_X, ImGuiKey_X },
-    { Qt::Key_Y, ImGuiKey_Y },
-    { Qt::Key_Z, ImGuiKey_Z },
-    { Qt::MiddleButton, ImGuiMouseButton_Middle }
-};
 
 #ifndef QT_NO_CURSOR
 const QHash<ImGuiMouseCursor, Qt::CursorShape> cursorMap = {
@@ -79,16 +53,8 @@ void ImGuiRenderer::initialize(WindowWrapper *window) {
     io.BackendFlags |= ImGuiBackendFlags_HasMouseCursors; // We can honor GetMouseCursor() values (optional)
     io.BackendFlags |= ImGuiBackendFlags_HasSetMousePos;  // We can honor io.WantSetMousePos requests (optional, rarely used)
     #endif
-    io.BackendPlatformName = "qtimgui";
-    
-    // Setup keyboard mapping
-    for (ImGuiKey key : keyMap.values()) {
-        io.KeyMap[key] = key;
-    }
-    
-    // io.RenderDrawListsFn = [](ImDrawData *drawData) {
-    //    instance()->renderDrawList(drawData);
-    // };
+    io.BackendPlatformName = "qtimgui";    
+
     io.SetClipboardTextFn = [](void *user_data, const char *text) {
         Q_UNUSED(user_data);
         QGuiApplication::clipboard()->setText(text);
@@ -428,32 +394,19 @@ void ImGuiRenderer::onKeyPressRelease(QKeyEvent *event)
     ImGuiIO& io = ImGui::GetIO();
     
     const bool key_pressed = (event->type() == QEvent::KeyPress);
-    
-    // Translate `Qt::Key` into `ImGuiKey`, and apply 'pressed' state for that key
-    const auto key_it = keyMap.constFind( event->key() );
-    if (key_it != keyMap.constEnd()) { // Qt's key found in keyMap
-        const int imgui_key = *(key_it);
-        io.KeysDown[imgui_key] = key_pressed;
-    }
 
-    if (key_pressed) {
+    // Translate `Qt::Key` into `ImGuiKey`, and apply 'pressed' state for that key
+    const auto imgui_key = VirtualKeyToImGuiKey(event->nativeVirtualKey());
+
+    if (imgui_key!=ImGuiKey_None)
+        io.AddKeyEvent(imgui_key,key_pressed);
+
+     if (key_pressed) {
         const QString text = event->text();
         if (text.size() == 1) {
             io.AddInputCharacter( text.at(0).unicode() );
-        }
+      }
     }
-
-#ifdef Q_OS_MAC
-    io.KeyCtrl  = event->modifiers() & Qt::MetaModifier;
-    io.KeyShift = event->modifiers() & Qt::ShiftModifier;
-    io.KeyAlt   = event->modifiers() & Qt::AltModifier;
-    io.KeySuper = event->modifiers() & Qt::ControlModifier; // Comamnd key
-#else
-    io.KeyCtrl  = event->modifiers() & Qt::ControlModifier;
-    io.KeyShift = event->modifiers() & Qt::ShiftModifier;
-    io.KeyAlt   = event->modifiers() & Qt::AltModifier;
-    io.KeySuper = event->modifiers() & Qt::MetaModifier;
-#endif
 }
 
 void ImGuiRenderer::updateCursorShape(const ImGuiIO& io)
