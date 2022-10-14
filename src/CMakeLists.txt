@@ -4,7 +4,18 @@ project(qtimgui)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
-find_package(Qt5 COMPONENTS Core Quick Gui Widgets REQUIRED)
+
+# We're using qt versionless targets so our minimal Qt version is 5.15, we support Qt6 as well
+# See https://www.qt.io/blog/versionless-cmake-targets-qt-5.15
+find_package(Qt6 COMPONENTS COMPONENTS  Core Quick Gui Widgets OpenGLWidgets )
+if (NOT Qt6_FOUND)
+    find_package(Qt5 5.15 REQUIRED COMPONENTS Core Quick Gui Widgets)
+    if (NOT Qt5_FOUND)
+        message(FATAL_ERROR "We only support  only Qt 5.15 and higher.")
+    endif()
+endif()
+
+message(STATUS  Qt ${QT_DEFAULT_MAJOR_VERSION})
 
 set(
     qt_imgui_sources
@@ -21,7 +32,10 @@ target_link_libraries(
     qt_imgui_quick
     PUBLIC
     imgui
-    Qt5::Gui
+    Qt::Gui
+    # We use the new Qt Rendering Hardware Interface (RHI) when buzilding with Qt and thgus we need openglwidgets qt module
+    # see https://www.qt.io/blog/qt-5.15-released
+    $<$<BOOL:${Qt6_FOUND}>:Qt::OpenGLWidgets>
     )
 if (ANDROID)
     target_link_libraries(qt_imgui_quick PUBLIC log dl GLESv2 z)
@@ -34,7 +48,10 @@ target_link_libraries(
     qt_imgui_widgets
     PUBLIC
     imgui
-    Qt5::Widgets
+    Qt::Widgets
+    # We use the new Qt Rendering Hardware Interface (RHI) when buzilding with Qt and thgus we need openglwidgets qt module
+    # see https://www.qt.io/blog/qt-5.15-released
+    $<$<BOOL:${Qt6_FOUND}>:Qt::OpenGLWidgets>
     )
 if (ANDROID)
     target_link_libraries(qt_imgui_widgets PUBLIC log dl GLESv2 z)
