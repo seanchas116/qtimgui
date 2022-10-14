@@ -36,7 +36,10 @@ class QWidgetWindowWrapper : public QWindowWrapper {
 public:
     QWidgetWindowWrapper(QWidget *w, ImGuiRenderer* r) 
       : QWindowWrapper(r), w(w)
-    {}
+    {
+        // Set our widget to receive keyboard events
+         w->setFocusPolicy(Qt::StrongFocus);
+    }
     void installEventFilter(QObject *object) override {
         return w->installEventFilter(object);
     }
