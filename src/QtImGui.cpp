@@ -81,7 +81,20 @@ public:
             Q_UNUSED(local_pos);
         #endif
     }
-    
+
+    QPointF mapToGlobal(const QPointF& pos) const override {
+        return w->mapToGlobal(pos);
+    }
+
+    WId nativeHandle() const override {
+        return w->winId();
+    }
+
+    void setMouseTracking(bool on) override {
+        w->setMouseTracking(on);
+    }
+
+
 private:
     QWidget *w;
 };
@@ -151,6 +164,18 @@ public:
             Q_UNUSED(local_pos);
         #endif
     }
+     
+    QPointF mapToGlobal(const QPointF& pos) const override {
+        return w->mapToGlobal(pos);
+    }
+    
+    WId nativeHandle() const override {
+        return w->winId();
+    }
+    void setMouseTracking(bool on) override {
+        w->setMouseGrabEnabled(on);
+    }
+
 
 private:
     QWindow *w;

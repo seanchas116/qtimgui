@@ -5,6 +5,8 @@
 #include <QMouseEvent>
 #include <QClipboard>
 #include <QCursor>
+#include <QWidget> 
+
 
 #ifdef ANDROID
 #define GL_VERTEX_ARRAY_BINDING           0x85B5 // Missing in android as of May 2020
@@ -48,27 +50,37 @@ void ImGuiRenderer::initialize(WindowWrapper *window) {
     ImGui::SetCurrentContext(g_ctx);
 
     // Setup backend capabilities flags
-    ImGuiIO &io = ImGui::GetIO();
-    #ifndef QT_NO_CURSOR
+    ImGuiIO& io = ImGui::GetIO();
+   
+
+#ifndef QT_NO_CURSOR
     io.BackendFlags |= ImGuiBackendFlags_HasMouseCursors; // We can honor GetMouseCursor() values (optional)
     io.BackendFlags |= ImGuiBackendFlags_HasSetMousePos;  // We can honor io.WantSetMousePos requests (optional, rarely used)
-    #endif
-    io.BackendPlatformName = "qtimgui";    
+#endif
+    io.BackendPlatformName = "qtimgui";
 
-    io.SetClipboardTextFn = [](void *user_data, const char *text) {
+    
+    // Set platform dependent data in viewport
+    ImGui::GetMainViewport()->PlatformHandleRaw = (void*)m_window->nativeHandle();
+
+    LastMouseCursor = ImGuiMouseCursor_COUNT;
+
+    io.SetClipboardTextFn = [](void* user_data, const char* text) {
         Q_UNUSED(user_data);
         QGuiApplication::clipboard()->setText(text);
     };
-    io.GetClipboardTextFn = [](void *user_data) {
+    io.GetClipboardTextFn = [](void* user_data) {
         Q_UNUSED(user_data);
         g_currentClipboardText = QGuiApplication::clipboard()->text().toUtf8();
-        return (const char *)g_currentClipboardText.data();
+        return static_cast<const char*>(g_currentClipboardText.data());
     };
 
+    //needed to receive mouse move events for QWidget instances
+    m_window->setMouseTracking(true);
     window->installEventFilter(this);
 }
 
-void ImGuiRenderer::renderDrawList(ImDrawData *draw_data)
+void ImGuiRenderer::renderDrawList(ImDrawData* draw_data)
 {
     // Select current context
     ImGui::SetCurrentContext(g_ctx);
@@ -297,50 +309,58 @@ void ImGuiRenderer::newFrame()
     double current_time =  QDateTime::currentMSecsSinceEpoch() / double(1000);
     io.DeltaTime = g_Time > 0.0 ? (float)(current_time - g_Time) : (float)(1.0f/60.0f);
     if (io.DeltaTime <= 0.0f) io.DeltaTime = 0.00001f;
-    g_Time = current_time;
-    
-    
-    // If ImGui wants to set cursor position (for example, during navigation by using keyboard)
-    // we need to do it here (before getting `QCursor::pos()` below).
-    setCursorPos(io);
+    g_Time = current_time;  
 
-    // Setup inputs
-    // (we already got mouse wheel, keyboard keys & characters from glfw callbacks polled in glfwPollEvents())
+#ifndef QT_NO_CURSOR    
     if (m_window->isActive())
     {
-        const QPoint pos = m_window->mapFromGlobal(QCursor::pos());
-        io.MousePos = ImVec2(pos.x(), pos.y());   // Mouse position in screen coordinates (set to -1,-1 if no mouse / on another screen, etc.)
-    }
-    else
-    {
-        io.MousePos = ImVec2(-1,-1);
+        // (Optional) Set OS mouse position from Dear ImGui if requested (rarely used, only when ImGuiConfigFlags_NavEnableSetMousePos is enabled by user)
+        if (io.WantSetMousePos)
+        {
+            qDebug() << "m_window->setCursorPos\n";
+            m_window->setCursorPos(QPointF(MousePos.x, MousePos.y).toPoint());
+        }
+
+        // (Optional) Fallback to provide mouse position when focused (WM_MOUSEMOVE already provides this when hovered or captured)
+        if (!io.WantSetMousePos && !MouseTracked)
+        {   
+            const auto pos = m_window->mapFromGlobal(QCursor::pos());
+            io.AddMousePosEvent((float)pos.x(), (float)pos.y());
+        }        
     }
 
-    for (int i = 0; i < 3; i++)
-    {
-        io.MouseDown[i] = g_MousePressed[i];
-    }
-
-    io.MouseWheelH = g_MouseWheelH;
-    io.MouseWheel = g_MouseWheel;
-    g_MouseWheelH = 0;
-    g_MouseWheel = 0;
-
-    
     updateCursorShape(io);
-    
-
+#endif
     // Start the frame
     ImGui::NewFrame();
 }
 
 void ImGuiRenderer::render()
 {
-  // Select current context
-  ImGui::SetCurrentContext(g_ctx);
+    // Select current context
+    ImGui::SetCurrentContext(g_ctx);
+    auto drawData = ImGui::GetDrawData();
+    renderDrawList(drawData);
+}
 
-  auto drawData = ImGui::GetDrawData();
-  renderDrawList(drawData);
+void ImGuiRenderer::onMouseMove(QMouseEvent* event) {
+    assert(event != nullptr);
+    ImGuiIO& io = ImGui::GetIO();
+    if (!MouseTracked)  MouseTracked = true;
+    MousePos = ImVec2(static_cast<float>(event->position().x()), static_cast<float>(event->position().y()));
+    io.AddMousePosEvent(MousePos.x, MousePos.y);
+}
+
+
+void ImGuiRenderer::onMouseLeave()
+{
+    // Select current context
+    ImGui::SetCurrentContext(g_ctx);
+    ImGuiIO& io = ImGui::GetIO();
+    MouseTracked = false;
+    MousePos = ImVec2(-FLT_MAX, -FLT_MAX);
+    io.AddMousePosEvent(MousePos.x, MousePos.y);  
+    qDebug() << "Leave \n";
 }
 
 ImGuiRenderer::ImGuiRenderer()
@@ -354,43 +374,37 @@ ImGuiRenderer::~ImGuiRenderer()
   ImGui::DestroyContext(g_ctx);
 }
 
-void ImGuiRenderer::onMousePressedChange(QMouseEvent *event)
+void ImGuiRenderer::onMousePressed(QMouseEvent* event)
 {
-    g_MousePressed[0] = event->buttons() & Qt::LeftButton;
-    g_MousePressed[1] = event->buttons() & Qt::RightButton;
-    g_MousePressed[2] = event->buttons() & Qt::MiddleButton;
+    assert(event != nullptr);
+    ImGuiIO& io = ImGui::GetIO();
+    LastMouseButton = mouseEventToImGuiMouseButton(event);
+    MouseDown |= 1 << LastMouseButton;        
+    //io.MouseDoubleClicked[LastMouseButton] = event->type() == QEvent::MouseButtonDblClick;
+    io.AddMouseButtonEvent(LastMouseButton, true);//event->type() != QEvent::MouseButtonDblClick);
 }
 
-void ImGuiRenderer::onWheel(QWheelEvent *event)
+void ImGuiRenderer::onMouseReleased(QMouseEvent* event)
 {
-    // Select current context
-    ImGui::SetCurrentContext(g_ctx);
-
-    // Handle horizontal component
-    if(event->pixelDelta().x() != 0)
-    {
-        g_MouseWheelH += event->pixelDelta().x() / (ImGui::GetTextLineHeight());
-    } else {
-        // Magic number of 120 comes from Qt doc on QWheelEvent::pixelDelta()
-        g_MouseWheelH += event->angleDelta().x() / 120.0f;
-    }
-
-    // Handle vertical component
-    if(event->pixelDelta().y() != 0)
-    {
-        // 5 lines per unit
-        g_MouseWheel += event->pixelDelta().y() / (5.0 * ImGui::GetTextLineHeight());
-    } else {
-        // Magic number of 120 comes from Qt doc on QWheelEvent::pixelDelta()
-        g_MouseWheel += event->angleDelta().y() / 120.0f;
-    }
+    assert(event != nullptr);
+    ImGuiIO& io = ImGui::GetIO();   
+    MouseDown &= ~(1 << LastMouseButton);
+    io.AddMouseButtonEvent(LastMouseButton, false);
 }
 
-void ImGuiRenderer::onKeyPressRelease(QKeyEvent *event)
-{
+void ImGuiRenderer::onWheel(QWheelEvent* event){
+    assert(event != nullptr);
     // Select current context
     ImGui::SetCurrentContext(g_ctx);
+    ImGuiIO& io = ImGui::GetIO();
+    io.AddMouseWheelEvent(event->angleDelta().x(),event->angleDelta().y());
+}
 
+void ImGuiRenderer::onKeyPressRelease(QKeyEvent* event)
+{
+    assert(event != nullptr);
+    // Select current context
+    ImGui::SetCurrentContext(g_ctx);
     ImGuiIO& io = ImGui::GetIO();
     
     const bool key_pressed = (event->type() == QEvent::KeyPress);
@@ -401,90 +415,112 @@ void ImGuiRenderer::onKeyPressRelease(QKeyEvent *event)
     if (imgui_key!=ImGuiKey_None)
         io.AddKeyEvent(imgui_key,key_pressed);
 
-     if (key_pressed) {
+    if (key_pressed) {
         const QString text = event->text();
         if (text.size() == 1) {
-            io.AddInputCharacter( text.at(0).unicode() );
-      }
+            io.AddInputCharacter(text.at(0).unicode());
+        }
     }
 }
 
 void ImGuiRenderer::updateCursorShape(const ImGuiIO& io)
 {
-    // NOTE: This code will be executed, only if the following flags have been set:
-    // - backend flag: `ImGuiBackendFlags_HasMouseCursors`    - enabled
-    // - config  flag: `ImGuiConfigFlags_NoMouseCursorChange` - disabled
+
+    // Update OS mouse cursor with the cursor requested by imgui
+    const ImGuiMouseCursor mouse_cursor = io.MouseDrawCursor ? ImGuiMouseCursor_None : ImGui::GetMouseCursor();
+    if (LastMouseCursor != mouse_cursor)
+    {
+        LastMouseCursor = mouse_cursor;
+        // NOTE: This code will be executed, only if the following flags have been set:
+        // - backend flag: `ImGuiBackendFlags_HasMouseCursors`    - enabled
+        // - config  flag: `ImGuiConfigFlags_NoMouseCursorChange` - disabled
 
 #ifndef QT_NO_CURSOR
-    if (io.ConfigFlags & ImGuiConfigFlags_NoMouseCursorChange)
-        return;
+        if (io.ConfigFlags & ImGuiConfigFlags_NoMouseCursorChange)
+            return;
 
-    const ImGuiMouseCursor imgui_cursor = ImGui::GetMouseCursor();
-    if (io.MouseDrawCursor || (imgui_cursor == ImGuiMouseCursor_None))
-    {
-        // Hide OS mouse cursor if imgui is drawing it or if it wants no cursor
-        m_window->setCursorShape(Qt::CursorShape::BlankCursor);
+        const ImGuiMouseCursor imgui_cursor = ImGui::GetMouseCursor();
+        if (io.MouseDrawCursor || (imgui_cursor == ImGuiMouseCursor_None))
+        {
+            // Hide OS mouse cursor if imgui is drawing it or if it wants no cursor
+            m_window->setCursorShape(Qt::CursorShape::BlankCursor);
+        }
+        else
+        {
+            // Show OS mouse cursor
+
+            // Translate `ImGuiMouseCursor` into `Qt::CursorShape` and show it, if we can
+            const auto cursor_it = cursorMap.constFind(imgui_cursor);
+            if (cursor_it != cursorMap.constEnd()) // `Qt::CursorShape` found for `ImGuiMouseCursor`
+            {
+                const Qt::CursorShape qt_cursor_shape = *(cursor_it);
+                m_window->setCursorShape(qt_cursor_shape);
+            }
+            else // shape NOT found - use default
+            {
+                m_window->setCursorShape(Qt::CursorShape::ArrowCursor);
+            }
+        }
+#else
+        Q_UNUSED(io);
+#endif
     }
-    else
-    {
-        // Show OS mouse cursor
+}
+
+
+bool ImGuiRenderer::eventFilter(QObject* watched, QEvent* event)
+{
+    ImGui::SetCurrentContext(g_ctx);
+    ImGuiIO& io = ImGui::GetIO();
+
+    if (watched == m_window->object()) {
         
-        // Translate `ImGuiMouseCursor` into `Qt::CursorShape` and show it, if we can
-        const auto cursor_it = cursorMap.constFind( imgui_cursor );
-        if(cursor_it != cursorMap.constEnd()) // `Qt::CursorShape` found for `ImGuiMouseCursor`
-        {
-            const Qt::CursorShape qt_cursor_shape = *(cursor_it);
-            m_window->setCursorShape(qt_cursor_shape);
+        switch (event->type()) {
+        case QEvent::MouseMove:
+            onMouseMove(dynamic_cast<QMouseEvent*>(event));
+            break;
+        case QMouseEvent::Leave:
+            onMouseLeave();
+            break;
+        case QEvent::MouseButtonDblClick: case QEvent::MouseButtonPress:
+            this->onMousePressed(dynamic_cast<QMouseEvent*>(event));
+            break;
+        case QEvent::MouseButtonRelease:
+            this->onMouseReleased(dynamic_cast<QMouseEvent*>(event));
+            break;
+        case QEvent::Wheel:
+            this->onWheel(static_cast<QWheelEvent*>(event));
+            break;
+        case QEvent::KeyPress:
+        case QEvent::KeyRelease:             
+            this->onKeyPressRelease(static_cast<QKeyEvent*>(event));
+            break;
+        case QEvent::FocusOut:
+            io.AddFocusEvent(false);
+            break;
+        case QEvent::FocusIn:
+            io.AddFocusEvent(true);
+            break;
+        default:
+            break;
         }
-        else // shape NOT found - use default
-        {
-            m_window->setCursorShape(Qt::CursorShape::ArrowCursor);
-        }
     }
-#else
-    Q_UNUSED(io);
-#endif
+
+    return QObject::eventFilter(watched, event);
 }
 
-void ImGuiRenderer::setCursorPos(const ImGuiIO& io)
+int ImGuiRenderer::mouseEventToImGuiMouseButton(QMouseEvent* event)
 {
-    // NOTE: This code will be executed, only if the following flags have been set:
-    // - backend flag: `ImGuiBackendFlags_HasSetMousePos`      - enabled
-    // - config  flag: `ImGuiConfigFlags_NavEnableSetMousePos` - enabled
-    
-#ifndef QT_NO_CURSOR
-    if(io.WantSetMousePos) {
-        m_window->setCursorPos({(int)io.MousePos.x, (int)io.MousePos.y});
-    }
-#else
-    Q_UNUSED(io);
-#endif
+    if (event->buttons() & Qt::LeftButton) return 0;
+    if (event->buttons() & Qt::RightButton) return 1;
+    if (event->buttons() & Qt::MiddleButton) return 2;
+    if (event->buttons() & Qt::XButton1) return  3;
+    if (event->buttons() & Qt::XButton2) return  4;
+    return ImGuiMouseButton_COUNT;
 }
 
-bool ImGuiRenderer::eventFilter(QObject *watched, QEvent *event)
+ImGuiRenderer* ImGuiRenderer::instance()
 {
-  if (watched == m_window->object()) {
-    switch (event->type()) {
-    case QEvent::MouseButtonDblClick:
-    case QEvent::MouseButtonPress:
-    case QEvent::MouseButtonRelease:
-      this->onMousePressedChange(static_cast<QMouseEvent*>(event));
-      break;
-    case QEvent::Wheel:
-      this->onWheel(static_cast<QWheelEvent*>(event));
-      break;
-    case QEvent::KeyPress:
-    case QEvent::KeyRelease:
-      this->onKeyPressRelease(static_cast<QKeyEvent*>(event));
-      break;
-    default:
-      break;
-    }
-  }
-  return QObject::eventFilter(watched, event);
-}
-
-ImGuiRenderer* ImGuiRenderer::instance() {
     static ImGuiRenderer* instance = nullptr;
     if (!instance) {
         instance = new ImGuiRenderer();
