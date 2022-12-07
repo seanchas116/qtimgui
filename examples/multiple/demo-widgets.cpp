@@ -2,6 +2,8 @@
 #include <imgui.h>
 #include <implot.h>
 
+#include <cmath> // sin
+
 #include <QApplication>
 #include <QGridLayout>
 #include <QOpenGLExtraFunctions>
