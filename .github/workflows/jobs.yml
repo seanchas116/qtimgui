@@ -1,0 +1,26 @@
+name: qtimgui
+on: [push, pull_request]
+jobs:
+  ubuntu:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Clone and check out repository code
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+          ref: ${{github.event.pull_request.head.ref}} # Branch where changes are implemented.
+          repository: ${{github.event.pull_request.head.repo.full_name}} # Repo where changes are implemented.
+      - name: Check commit
+        run: |
+          git log -1
+      - name: Update OS
+        run: sudo apt-get update
+      - name: Install apt-get dependencies
+        run: sudo apt-get install -y build-essential qtdeclarative5-dev
+      - name: Run job
+        run: |
+          git submodule update --init --recursive
+          mkdir build
+          cd build
+          cmake ..
+          make all
