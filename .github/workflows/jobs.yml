@@ -39,7 +39,7 @@ jobs:
       - name: Update OS
         run: brew update
       - name: Install dependencies
-        run: brew install llvm qt
+        run: brew install llvm qt@5
       - name: Run job
         run: |
           git submodule update --init --recursive
