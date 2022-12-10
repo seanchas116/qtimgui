@@ -45,5 +45,5 @@ jobs:
           git submodule update --init --recursive
           mkdir build
           cd build
-          cmake ..
+          CMAKE_PREFIX_PATH=/usr/local/opt/qt@5/ cmake ..
           make all
