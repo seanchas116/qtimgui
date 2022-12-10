@@ -38,7 +38,7 @@ jobs:
           git log -1
       - name: Update OS
         run: brew update
-      - name: Install apt-get dependencies
+      - name: Install dependencies
         run: brew install llvm qt
       - name: Run job
         run: |
