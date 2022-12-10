@@ -24,3 +24,26 @@ jobs:
           cd build
           cmake ..
           make all
+  macos:
+    runs-on: macos-latest
+    steps:
+      - name: Clone and check out repository code
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+          ref: ${{github.event.pull_request.head.ref}} # Branch where changes are implemented.
+          repository: ${{github.event.pull_request.head.repo.full_name}} # Repo where changes are implemented.
+      - name: Check commit
+        run: |
+          git log -1
+      - name: Update OS
+        run: brew update
+      - name: Install dependencies
+        run: brew install llvm qt@5
+      - name: Run job
+        run: |
+          git submodule update --init --recursive
+          mkdir build
+          cd build
+          cmake ..
+          make all
