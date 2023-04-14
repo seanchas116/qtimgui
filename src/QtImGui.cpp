@@ -36,7 +36,10 @@ class QWidgetWindowWrapper : public QWindowWrapper {
 public:
     QWidgetWindowWrapper(QWidget *w, ImGuiRenderer* r) 
       : QWindowWrapper(r), w(w)
-    {}
+    {
+        // Set our widget to receive keyboard events
+         w->setFocusPolicy(Qt::StrongFocus);
+    }
     void installEventFilter(QObject *object) override {
         return w->installEventFilter(object);
     }
@@ -78,7 +81,20 @@ public:
             Q_UNUSED(local_pos);
         #endif
     }
-    
+
+    QPointF mapToGlobal(const QPointF& pos) const override {
+        return w->mapToGlobal(pos);
+    }
+
+    WId nativeHandle() const override {
+        return w->winId();
+    }
+
+    void setMouseTracking(bool on) override {
+        w->setMouseTracking(on);
+    }
+
+
 private:
     QWidget *w;
 };
@@ -148,6 +164,18 @@ public:
             Q_UNUSED(local_pos);
         #endif
     }
+     
+    QPointF mapToGlobal(const QPointF& pos) const override {
+        return w->mapToGlobal(pos);
+    }
+    
+    WId nativeHandle() const override {
+        return w->winId();
+    }
+    void setMouseTracking(bool on) override {
+        w->setMouseGrabEnabled(on);
+    }
+
 
 private:
     QWindow *w;

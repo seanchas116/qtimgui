@@ -5,6 +5,7 @@
 #include <QSurfaceFormat>
 #include <QOpenGLWindow>
 #include <QOpenGLExtraFunctions>
+#include <implot.h>
 
 class DemoWindow : public QOpenGLWindow, private QOpenGLExtraFunctions
 {
@@ -13,6 +14,9 @@ protected:
     {
         initializeOpenGLFunctions();
         QtImGui::initialize(this);
+        // Update at 60 fps
+        QObject::connect(&timer, SIGNAL(timeout()), this, SLOT(update()));
+        timer.start(16);
     }
     void paintGL() override
     {
@@ -59,6 +63,7 @@ private:
     bool show_test_window = true;
     bool show_another_window = false;
     ImVec4 clear_color = ImColor(114, 144, 154);
+    QTimer timer;
 };
 
 int main(int argc, char *argv[])
@@ -79,11 +84,6 @@ int main(int argc, char *argv[])
     w.setTitle("QtImGui window example");
     w.resize(1280, 720);
     w.show();
-
-    // Update at 60 fps
-    QTimer timer;
-    QObject::connect(&timer, SIGNAL(timeout()), &w, SLOT(update()));
-    timer.start(16);
 
     return a.exec();
 }

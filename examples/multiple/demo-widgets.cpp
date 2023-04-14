@@ -20,12 +20,9 @@ class DemoWindow
   {
     initializeOpenGLFunctions();
     ref = QtImGui::initialize(this, false);
-
-    // Update at 60 fps
-    auto* timer = new QTimer(this);
-    QObject::connect(timer, SIGNAL(timeout()), this, SLOT(update()));
-    timer->start(16);
-
+    // Update at 60 fps   
+    QObject::connect(&timer, SIGNAL(timeout()), this, SLOT(update()));
+    timer.start(16);
     // create plot context
     ctx = ImPlot::CreateContext();
   }
@@ -47,26 +44,28 @@ class DemoWindow
     ImGui::SetNextWindowSize(use_work_area ? viewport->WorkSize : viewport->Size);
 
     if (ImGui::Begin("Example: Fullscreen window", nullptr, flags)) {
-      ImGui::BulletText("Click and drag the horizontal and vertical lines.");
-
-      ImGui::Checkbox("Show Labels##1", &show_labels);
-      if (ImPlot::BeginPlot("##guides", 0, 0, ImVec2(-1, -1), ImPlotFlags_YAxis2)) {
-        ImPlot::DragLineX("x1", &x1, show_labels);
-        ImPlot::DragLineX("x2", &x2, show_labels);
-        ImPlot::DragLineY("y1", &y1, show_labels);
-        ImPlot::DragLineY("y2", &y2, show_labels);
-        double xs[1000], ys[1000];
-        for (int i = 0; i < 1000; ++i) {
-          xs[i] = (x2 + x1) / 2 + abs(x2 - x1) * (i / 1000.0f - 0.5f);
-          ys[i] = (y1 + y2) / 2 + abs(y2 - y1) / 2 * sin(f * i / 10);
+        ImGui::InputTextWithHint("input text (w/ hint)", "enter text here", input_text, IM_ARRAYSIZE(input_text));
+        ImGui::BulletText("Click and drag the horizontal and vertical lines.");
+        ImGui::CheckboxFlags("NoCursors", (unsigned int*)&drag_flags, ImPlotDragToolFlags_NoCursors); ImGui::SameLine();
+        ImGui::CheckboxFlags("NoFit", (unsigned int*)&drag_flags, ImPlotDragToolFlags_NoFit); ImGui::SameLine();
+        ImGui::CheckboxFlags("NoInput", (unsigned int*)&drag_flags, ImPlotDragToolFlags_NoInputs);
+        if (ImPlot::BeginPlot("##lines",ImVec2(-1,0))) {
+           ImPlot::SetupAxesLimits(0,1,0,1);
+           ImPlot::DragLineX(0,&x1,ImVec4(1,1,1,1),1,drag_flags);
+           ImPlot::DragLineX(1,&x2,ImVec4(1,1,1,1),1,drag_flags);
+           ImPlot::DragLineY(2,&y1,ImVec4(1,1,1,1),1,drag_flags);
+           ImPlot::DragLineY(3,&y2,ImVec4(1,1,1,1),1,drag_flags);
+           double xs[1000], ys[1000];
+           for (int i = 0; i < 1000; ++i) {
+               xs[i] = (x2+x1)/2+fabs(x2-x1)*(i/1000.0f - 0.5f);
+               ys[i] = (y1+y2)/2+fabs(y2-y1)/2*sin(f*i/10);
+           }
+           ImPlot::PlotLine("Interactive Data", xs, ys, 1000);
+           ImPlot::DragLineY(120482,&f,ImVec4(1,0.5f,1,1),1,drag_flags);
+           ImPlot::EndPlot();
         }
-        ImPlot::PlotLine("Interactive Data", xs, ys, 1000);
-        ImPlot::SetPlotYAxis(ImPlotYAxis_2);
-        ImPlot::DragLineY("f", &f, show_labels, ImVec4(1, 0.5f, 1, 1));
-        ImPlot::EndPlot();
-      }
-    }
-    ImGui::End();
+        ImGui::End();
+     }
 
     // Do render before ImGui UI is rendered
     glViewport(0, 0, width(), height());
@@ -86,8 +85,11 @@ class DemoWindow
   double         y1          = 0.25;
   double         y2          = 0.75;
   double         f           = 0.1;
+  ImPlotDragToolFlags drag_flags = ImPlotDragToolFlags_None;
   bool           show_labels = true;
   ImPlotContext* ctx         = nullptr;
+  QTimer timer;
+  char input_text[128] = "";
 };
 
 int main(int argc, char* argv[])
