@@ -17,36 +17,12 @@
 #define IMGUIRENDERER_GLSL_VERSION "#version 330\n"
 #endif
 
+// Direclty including windows key mappings, plus not handling imgui version to support older ones
+#include "QtKeyMappings.h"
+
 namespace QtImGui {
 
 namespace {
-
-// Keyboard mapping. Dear ImGui use those indices to peek into the io.KeysDown[] array.
-const QHash<int, ImGuiKey> keyMap = {
-    { Qt::Key_Tab, ImGuiKey_Tab },
-    { Qt::Key_Left, ImGuiKey_LeftArrow },
-    { Qt::Key_Right, ImGuiKey_RightArrow },
-    { Qt::Key_Up, ImGuiKey_UpArrow },
-    { Qt::Key_Down, ImGuiKey_DownArrow },
-    { Qt::Key_PageUp, ImGuiKey_PageUp },
-    { Qt::Key_PageDown, ImGuiKey_PageDown },
-    { Qt::Key_Home, ImGuiKey_Home },
-    { Qt::Key_End, ImGuiKey_End },
-    { Qt::Key_Insert, ImGuiKey_Insert },
-    { Qt::Key_Delete, ImGuiKey_Delete },
-    { Qt::Key_Backspace, ImGuiKey_Backspace },
-    { Qt::Key_Space, ImGuiKey_Space },
-    { Qt::Key_Enter, ImGuiKey_Enter },
-    { Qt::Key_Return, ImGuiKey_Enter },
-    { Qt::Key_Escape, ImGuiKey_Escape },
-    { Qt::Key_A, ImGuiKey_A },
-    { Qt::Key_C, ImGuiKey_C },
-    { Qt::Key_V, ImGuiKey_V },
-    { Qt::Key_X, ImGuiKey_X },
-    { Qt::Key_Y, ImGuiKey_Y },
-    { Qt::Key_Z, ImGuiKey_Z },
-    { Qt::MiddleButton, ImGuiMouseButton_Middle }
-};
 
 #ifndef QT_NO_CURSOR
 const QHash<ImGuiMouseCursor, Qt::CursorShape> cursorMap = {
@@ -80,12 +56,7 @@ void ImGuiRenderer::initialize(WindowWrapper *window) {
     io.BackendFlags |= ImGuiBackendFlags_HasSetMousePos;  // We can honor io.WantSetMousePos requests (optional, rarely used)
     #endif
     io.BackendPlatformName = "qtimgui";
-    
-    // Setup keyboard mapping
-    for (ImGuiKey key : keyMap.values()) {
-        io.KeyMap[key] = key;
-    }
-    
+
     // io.RenderDrawListsFn = [](ImDrawData *drawData) {
     //    instance()->renderDrawList(drawData);
     // };
@@ -339,7 +310,7 @@ void ImGuiRenderer::newFrame()
     io.DisplaySize = ImVec2(m_window->size().width(), m_window->size().height());
     io.DisplayFramebufferScale = ImVec2(m_window->devicePixelRatio(), m_window->devicePixelRatio());
 
-    // Setup time step
+    // Setup time step -> avoid passing null delta time to imgui (debug assert)
     double current_time =  QDateTime::currentMSecsSinceEpoch() / double(1000);
     io.DeltaTime = g_Time > 0.0 ? (float)(current_time - g_Time) : (float)(1.0f/60.0f);
     if (io.DeltaTime <= 0.0f) io.DeltaTime = 0.00001f;
@@ -438,15 +409,12 @@ void ImGuiRenderer::onKeyPressRelease(QKeyEvent *event)
     ImGui::SetCurrentContext(g_ctx);
 
     ImGuiIO& io = ImGui::GetIO();
-    
+
     const bool key_pressed = (event->type() == QEvent::KeyPress);
-    
-    // Translate `Qt::Key` into `ImGuiKey`, and apply 'pressed' state for that key
-    const auto key_it = keyMap.constFind( event->key() );
-    if (key_it != keyMap.constEnd()) { // Qt's key found in keyMap
-        const int imgui_key = *(key_it);
-        io.KeysDown[imgui_key] = key_pressed;
-    }
+
+    // // Translate `Qt::Key` into `ImGuiKey`, and apply 'pressed' state for that key
+    const auto imgui_key = VirtualKeyToImGuiKey(event->nativeVirtualKey());
+    if (imgui_key!=ImGuiKey_None) io.AddKeyEvent(imgui_key,key_pressed);
 
     if (key_pressed) {
         const QString text = event->text();
