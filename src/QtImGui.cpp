@@ -47,7 +47,7 @@ public:
         return w->devicePixelRatioF();
     }
     bool isActive() const override {
-        return w->isActiveWindow();
+        return w->isActiveWindow() && w->hasFocus();
     }
     QPoint mapFromGlobal(const QPoint &p) const override {
         return w->mapFromGlobal(p);
