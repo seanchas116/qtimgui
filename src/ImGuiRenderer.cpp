@@ -359,7 +359,11 @@ void ImGuiRenderer::newFrame()
     }
     else
     {
-        io.MousePos = ImVec2(-1,-1);
+        //https://github.com/ocornut/imgui/blob/031e152d292b386b7b6149e455924cfc6bab8c7c/imgui.h#L2048
+        // Mouse position, in pixels. Set to ImVec2(-FLT_MAX, -FLT_MAX) if mouse is unavailable (on another screen, etc.)
+        //https://github.com/ocornut/imgui/blob/fd943182bd9fe1d801e721a20a41dcde84be39d0/imgui.cpp#L679
+        // - 2017/08/25 (1.52) - io.MousePos needs to be set to ImVec2(-FLT_MAX,-FLT_MAX) when mouse is unavailable/missing. Previously ImVec2(-1,-1) was enough but we now accept negative mouse coordinates. In your backend if you need to support unavailable mouse, make sure to replace "io.MousePos = ImVec2(-1,-1)" with "io.MousePos = ImVec2(-FLT_MAX,-FLT_MAX)".
+        io.MousePos = ImVec2(-FLT_MAX,-FLT_MAX);
     }
 
     for (int i = 0; i < 3; i++)
