@@ -47,7 +47,14 @@ public:
         return w->devicePixelRatioF();
     }
     bool isActive() const override {
-        return w->isActiveWindow() && w->hasFocus();
+        // the window containing the widget top-level window that currently has focus
+        //return w->isActiveWindow();
+      
+        // the widget is the one with focus among the window wigets
+        //return w->isActiveWindow() && w->hasFocus();
+
+        // the widget area is under the mouse, but it seems like other widgets being open/focused cancel it e.g. an open combo box
+        return w->isActiveWindow() && w->underMouse();
     }
     QPoint mapFromGlobal(const QPoint &p) const override {
         return w->mapFromGlobal(p);
