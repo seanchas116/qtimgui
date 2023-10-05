@@ -5,7 +5,10 @@ SOURCES += \
     $$PWD/modules/imgui/imgui.cpp \
     $$PWD/modules/imgui/imgui_demo.cpp \
     $$PWD/modules/imgui/imgui_widgets.cpp \
-    $$PWD/modules/imgui/imgui_tables.cpp
+    $$PWD/modules/imgui/imgui_tables.cpp \
+    $$PWD/modules/implot/implot.cpp \
+    $$PWD/modules/implot/implot_demo.cpp \
+    $$PWD/modules/implot/implot_items.cpp
 
 INCLUDEPATH += \
     $$PWD/modules/imgui \
